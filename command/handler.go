@@ -2,7 +2,6 @@ package command
 
 import (
 	"strings"
-	"time"
 
 	"github.com/pajlada/pajbot2/bot"
 	"github.com/pajlada/pajbot2/common"
@@ -16,10 +15,6 @@ type Handler struct {
 
 // AddCommand adds the given command to the list of commands
 func (h *Handler) AddCommand(c Command) {
-	bc := c.GetBaseCommand()
-	// default values for now
-	bc.Cooldown = time.Second * 5
-	bc.UserCooldown = time.Second * 15
 	h.commands = append(h.commands, c)
 }
 

@@ -16,6 +16,13 @@ type FuncCommand struct {
 
 var _ Command = (*FuncCommand)(nil)
 
+// NewFuncCommand returns a new func command
+func NewFuncCommand(triggers []string) *FuncCommand {
+	return &FuncCommand{
+		BaseCommand: *NewBaseCommand(triggers),
+	}
+}
+
 /*
 IsTriggered returns true with the relevant Command if it finds a match
 */

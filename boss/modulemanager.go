@@ -30,6 +30,7 @@ func modulesInit(b *bot.Bot) {
 		&modules.Test{},
 		&modules.Top{},
 		&modules.Emotes{},
+		modules.NewRoulette(),
 	}
 }
 

@@ -9,13 +9,25 @@ import (
 
 // BaseCommand xD
 type BaseCommand struct {
-	sync.Mutex   // we probably need this right?
+	sync.Mutex
+
 	ID           int
 	Triggers     []string
 	Level        int
 	Cooldown     time.Duration
 	UserCooldown time.Duration
 	lastUse      map[string]time.Time // lastUse["global"] is for everyone
+}
+
+// NewBaseCommand returns a BaseCommand with default values
+func NewBaseCommand(triggers []string) *BaseCommand {
+	return &BaseCommand{
+		ID:           -1,
+		Triggers:     triggers,
+		Level:        100,
+		Cooldown:     time.Second * 5,
+		UserCooldown: time.Second * 15,
+	}
 }
 
 // OnCooldown checks if the command is on cooldown
