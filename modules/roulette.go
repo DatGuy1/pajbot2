@@ -2,7 +2,6 @@ package modules
 
 import (
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/pajlada/pajbot2/bot"
@@ -124,7 +123,6 @@ func (module *Roulette) cmdRoulette(b *bot.Bot, msg *common.Msg, action *bot.Act
 
 	minBet := module.MinimumBet.Int()
 	maxBet := module.MaximumBet.Int()
-	bet := 0
 
 	args := helper.GetTriggersN(msg.Text, 1)
 	user := &msg.User
@@ -138,14 +136,10 @@ func (module *Roulette) cmdRoulette(b *bot.Bot, msg *common.Msg, action *bot.Act
 		return
 	}
 
-	if args[0] == "all" || args[0] == "allin" {
-		bet = user.Points
-	} else {
-		_bet, err := strconv.ParseInt(args[0], 10, 64)
-		if err != nil {
-			b.Mention(msg.User, usageMessage)
-		}
-		bet = int(_bet)
+	bet, err := msg.User.GetPoints(args[0])
+	if err != nil {
+		b.Mention(msg.User, usageMessage)
+		return
 	}
 
 	if bet <= 0 {
