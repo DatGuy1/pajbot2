@@ -17,20 +17,27 @@ func modulesUnload(b *bot.Bot) {
 func modulesInit(b *bot.Bot) {
 	// TODO(pajlada): Select which modules should be loaded
 	//                via a redis json list or something
-	b.AllModules = []bot.Module{
-		&modules.Admin{},
-		&modules.Banphrase{},
-		&modules.Bingo{},
-		&modules.Command{},
-		&modules.MyInfo{},
-		&modules.Points{},
-		&modules.Pyramid{},
-		&modules.Raffle{},
-		&modules.SubAnnounce{},
-		&modules.Test{},
-		&modules.Top{},
-		&modules.Emotes{},
-		modules.NewRoulette(),
+	if b.Channel.Name == "nymn_hs" {
+		b.AllModules = []bot.Module{
+			&modules.Admin{},
+			&modules.Emotes{},
+		}
+	} else {
+		b.AllModules = []bot.Module{
+			&modules.Admin{},
+			&modules.Banphrase{},
+			&modules.Bingo{},
+			&modules.Command{},
+			&modules.MyInfo{},
+			&modules.Points{},
+			&modules.Pyramid{},
+			&modules.Raffle{},
+			&modules.SubAnnounce{},
+			&modules.Test{},
+			&modules.Top{},
+			&modules.Emotes{},
+			modules.NewRoulette(),
+		}
 	}
 }
 
