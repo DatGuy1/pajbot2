@@ -49,7 +49,7 @@ func GetDBUser(session *sql.DB, name string, userType string) (DBUser, error) {
 	var outTwitchAccessToken string
 	var outTwitchRefreshToken string
 
-	err = stmt.QueryRow(name).Scan(&outID, &outName, &outTwitchAccessToken, &outTwitchRefreshToken)
+	err = stmt.QueryRow(name, userType).Scan(&outID, &outName, &outTwitchAccessToken, &outTwitchRefreshToken)
 	switch {
 	case err == sql.ErrNoRows:
 		return DBUser{}, err
