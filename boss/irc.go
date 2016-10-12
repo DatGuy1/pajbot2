@@ -310,7 +310,7 @@ func InitIRCConnection(config IRCConfig, botAccount common.DBUser) *Irc {
 	// Start a goroutine which handles joining and parting from channels
 	go irc.JoinChannels()
 
-	channels, err := common.FetchAllChannels(irc.SQL, botAccount.ID)
+	channels, err := common.GetChannelsByBotID(irc.SQL.Session, botAccount.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,7 +2,6 @@ package common
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/pajlada/pajbot2/sqlmanager"
@@ -46,36 +45,6 @@ type ChannelSQLWrapper struct {
 	BotID           int
 }
 
-// FetchAllChannels loads all channels from pb_channel in MySQL
-func FetchAllChannels(sql *sqlmanager.SQLManager, botID int) ([]Channel, error) {
-	var channels []Channel
-
-	const queryF = channelQ + " WHERE bot_id=?"
-
-	stmt, err := sql.Session.Prepare(queryF)
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := stmt.Query(botID)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		c := Channel{}
-		err = c.FetchFromSQL(rows)
-		if err != nil {
-			log.Error(err)
-		} else {
-			// The channel was fetched properly
-			channels = append(channels, c)
-		}
-	}
-
-	return channels, nil
-}
-
 /*
 FetchFromWrapper is the linker function that links the values of
 the ChannelSQLWrapper and the Channel struct together.
@@ -97,31 +66,20 @@ func (c *Channel) FetchFromWrapper(w ChannelSQLWrapper) {
 	c.BotID = w.BotID
 }
 
+// Scannable means sql.Rows or sql.Row
+type Scannable interface {
+	Scan(dest ...interface{}) error
+}
+
 // FetchFromSQL populates the given object with data from SQL based on the
 // given argument
-func (c *Channel) FetchFromSQL(row *sql.Rows) error {
+func (c *Channel) FetchFromSQL(row Scannable) error {
 	w := ChannelSQLWrapper{}
 
 	err := row.Scan(&w.ID, &w.Name, &w.Nickname, &w.Enabled, &w.BotID)
 
 	if err != nil {
 		log.Error(err)
-		return err
-	}
-
-	c.FetchFromWrapper(w)
-
-	return nil
-}
-
-// FetchFromSQLRow populates the given object with data from SQL based on the
-// given argument
-func (c *Channel) FetchFromSQLRow(row *sql.Row) error {
-	w := ChannelSQLWrapper{}
-
-	err := row.Scan(&w.ID, &w.Name, &w.Nickname, &w.Enabled, &w.BotID)
-
-	if err != nil {
 		return err
 	}
 
@@ -193,28 +151,44 @@ func (c *Channel) SQLSetBotID(sql *sqlmanager.SQLManager, botID int) error {
 	return nil
 }
 
-// GetChannel xD
-func GetChannel(session *sql.DB, name string) (Channel, error) {
+func getChannelsByQuery(session *sql.DB, query string, dest ...interface{}) ([]Channel, error) {
+	stmt, err := session.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.Query(dest...)
+	if err != nil {
+		return nil, err
+	}
+
+	var channels []Channel
+
+	for rows.Next() {
+		c := Channel{}
+		err = c.FetchFromSQL(rows)
+		if err != nil {
+			log.Error(err)
+		} else {
+			// The channel was fetched properly
+			channels = append(channels, c)
+		}
+	}
+
+	return channels, nil
+
+}
+
+// GetChannelsByName xD
+func GetChannelsByName(session *sql.DB, name string) ([]Channel, error) {
 	const queryF = channelQ + " WHERE name=?"
 
-	stmt, err := session.Prepare(queryF)
-	if err != nil {
-		return Channel{}, err
-	}
+	return getChannelsByQuery(session, queryF, name)
+}
 
-	var c Channel
+// GetChannelsByBotID xD
+func GetChannelsByBotID(session *sql.DB, botID int) ([]Channel, error) {
+	const queryF = channelQ + " WHERE bot_id=?"
 
-	err = c.FetchFromSQLRow(stmt.QueryRow(name))
-
-	switch {
-	case err == sql.ErrNoRows:
-		log.Error(err)
-		return Channel{}, fmt.Errorf("No channel with the name %s", name)
-
-	case err != nil:
-		log.Error(err)
-		return Channel{}, err
-	}
-
-	return c, nil
+	return getChannelsByQuery(session, queryF, botID)
 }

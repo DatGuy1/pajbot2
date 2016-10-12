@@ -239,13 +239,34 @@ func linkchannelCmd() {
 	fmt.Print("Channel name: ")
 	channelName = helper.ReadArg(reader)
 
-	c, err := common.GetChannel(sql.Session, channelName)
+	// See if the bot is active in the channel already
+	channels, err := common.GetChannelsByName(sql.Session, channelName)
 	if err != nil {
 		fmt.Println("No channel with the name " + channelName)
+		fmt.Println(err)
 		return
 	}
 
-	c.SQLSetBotID(sql, b.ID)
+	// TODO: Check for disabled channel with this bot id :)))))))))))
+	for _, c := range channels {
+		if c.BotID == b.ID {
+			fmt.Println("We are already linked!")
+			return
+		}
+		log.Debugf("xD: %#v", c)
+	}
+
+	// Create new channel object with this bot ID
+	c := &common.Channel{
+		Name:  channelName,
+		BotID: b.ID,
+	}
+	err = c.InsertNewToSQL(sql)
+	if err != nil {
+		fmt.Println("Error inserting channel to sql")
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Printf("Linked channel %s to bot %s\n", channelName, name)
 }
