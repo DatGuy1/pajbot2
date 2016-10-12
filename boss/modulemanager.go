@@ -20,7 +20,9 @@ func modulesInit(b *bot.Bot) {
 	if b.Channel.Name == "nymn_hs" {
 		b.AllModules = []bot.Module{
 			&modules.Admin{},
+			&modules.Debug{},
 			&modules.Emotes{},
+			modules.NewDebug(),
 		}
 	} else {
 		b.AllModules = []bot.Module{
@@ -28,14 +30,14 @@ func modulesInit(b *bot.Bot) {
 			&modules.Banphrase{},
 			&modules.Bingo{},
 			&modules.Command{},
-			&modules.MyInfo{},
+			&modules.Emotes{},
 			&modules.Points{},
 			&modules.Pyramid{},
 			&modules.Raffle{},
 			&modules.SubAnnounce{},
 			&modules.Test{},
 			&modules.Top{},
-			&modules.Emotes{},
+			modules.NewDebug(),
 			modules.NewRoulette(),
 		}
 	}
