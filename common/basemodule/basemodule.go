@@ -44,6 +44,15 @@ type BaseModule struct {
 	LevelBypassDefault int `json:"-"`
 }
 
+// NewBaseModule returns a BaseModule with default variables
+func NewBaseModule() BaseModule {
+	return BaseModule{
+		EnabledDefault:       false,
+		LevelRequiredDefault: 100,
+		LevelBypassDefault:   -1,
+	}
+}
+
 // SetDefaults sets the defaults values on the given module.
 func (m *BaseModule) SetDefaults(id string) {
 	m.EnabledDefault = false

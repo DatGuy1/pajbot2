@@ -33,11 +33,11 @@ var _ Module = (*Bingo)(nil)
 
 // NewBingo xD
 func NewBingo() *Bingo {
-	return &Bingo{
-		BaseModule: basemodule.BaseModule{
-			ID: "bingo",
-		},
+	m := Bingo{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "bingo"
+	return &m
 }
 
 func (module *Bingo) usageCommand(b *bot.Bot, msg *common.Msg, action *bot.Action) {

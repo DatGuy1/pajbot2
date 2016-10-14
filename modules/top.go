@@ -24,11 +24,11 @@ var _ Module = (*Top)(nil)
 
 // NewTop xD
 func NewTop() *Top {
-	return &Top{
-		BaseModule: basemodule.BaseModule{
-			ID: "top",
-		},
+	m := Top{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "top"
+	return &m
 }
 
 func (module *Top) topPoints(b *bot.Bot, msg *common.Msg, action *bot.Action) {

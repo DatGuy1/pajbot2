@@ -26,11 +26,11 @@ var _ Module = (*Command)(nil)
 
 // NewCommand xD
 func NewCommand() *Command {
-	return &Command{
-		BaseModule: basemodule.BaseModule{
-			ID: "command",
-		},
+	m := Command{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "command"
+	return &m
 }
 
 func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel common.Channel) int {

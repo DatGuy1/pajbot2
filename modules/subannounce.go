@@ -26,11 +26,11 @@ var _ Module = (*SubAnnounce)(nil)
 
 // NewSubAnnounce xD
 func NewSubAnnounce() *SubAnnounce {
-	return &SubAnnounce{
-		BaseModule: basemodule.BaseModule{
-			ID: "sub-announce",
-		},
+	m := SubAnnounce{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "sub-announce"
+	return &m
 }
 
 func (module *SubAnnounce) parseSettings(jsonData []byte) {

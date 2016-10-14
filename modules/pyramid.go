@@ -23,11 +23,11 @@ var _ Module = (*Pyramid)(nil)
 
 // NewPyramid xD
 func NewPyramid() *Pyramid {
-	return &Pyramid{
-		BaseModule: basemodule.BaseModule{
-			ID: "pyramid",
-		},
+	m := Pyramid{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "pyramid"
+	return &m
 }
 
 // Init xD

@@ -44,11 +44,11 @@ var _ Module = (*Banphrase)(nil)
 
 // NewBanphrase xD
 func NewBanphrase() *Banphrase {
-	return &Banphrase{
-		BaseModule: basemodule.BaseModule{
-			ID: "banphrase",
-		},
+	m := Banphrase{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "banphrase"
+	return &m
 }
 
 // Init xD

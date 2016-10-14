@@ -28,11 +28,11 @@ var _ Module = (*Debug)(nil)
 
 // NewDebug xD
 func NewDebug() *Debug {
-	return &Debug{
-		BaseModule: basemodule.BaseModule{
-			ID: "debug",
-		},
+	m := Debug{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "debug"
+	return &m
 }
 
 func cmdDebug(b *bot.Bot, msg *common.Msg, action *bot.Action) {

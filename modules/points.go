@@ -19,11 +19,11 @@ var _ Module = (*Points)(nil)
 
 // NewPoints xD
 func NewPoints() *Points {
-	return &Points{
-		BaseModule: basemodule.BaseModule{
-			ID: "points",
-		},
+	m := Points{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "points"
+	return &m
 }
 
 // Init xD

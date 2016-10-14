@@ -39,10 +39,8 @@ var _ Module = (*Roulette)(nil)
 
 // NewRoulette xD
 func NewRoulette() *Roulette {
-	return &Roulette{
-		BaseModule: basemodule.BaseModule{
-			ID: "roulette",
-		},
+	m := Roulette{
+		BaseModule: basemodule.NewBaseModule(),
 		WinMessage: StringSetting{
 			Label:        `Win message | %d = Points bet`,
 			DefaultValue: `$(source.name) won %d points in roulette and now has $(source.points) points! FeelsGoodMan`,
@@ -111,6 +109,8 @@ func NewRoulette() *Roulette {
 			MaxValue:     600,
 		},
 	}
+	m.ID = "roulette"
+	return &m
 }
 
 // Check roulette

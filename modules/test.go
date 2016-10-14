@@ -30,11 +30,11 @@ var _ Module = (*Test)(nil)
 
 // NewTest xD
 func NewTest() *Test {
-	return &Test{
-		BaseModule: basemodule.BaseModule{
-			ID: "test",
-		},
+	m := Test{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "test"
+	return &m
 }
 
 func cmdTest(b *bot.Bot, msg *common.Msg, action *bot.Action) {

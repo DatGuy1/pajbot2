@@ -29,11 +29,11 @@ var _ Module = (*Raffle)(nil)
 
 // NewRaffle xD
 func NewRaffle() *Raffle {
-	return &Raffle{
-		BaseModule: basemodule.BaseModule{
-			ID: "raffle",
-		},
+	m := Raffle{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "raffle"
+	return &m
 }
 
 func (module *Raffle) getMinPoints() int {

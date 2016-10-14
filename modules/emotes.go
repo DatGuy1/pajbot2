@@ -24,11 +24,11 @@ var _ Module = (*Emotes)(nil)
 
 // NewEmotes xD
 func NewEmotes() *Emotes {
-	return &Emotes{
-		BaseModule: basemodule.BaseModule{
-			ID: "emotes",
-		},
+	m := Emotes{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "emotes"
+	return &m
 }
 
 func (module *Emotes) ffzEmotes(b *bot.Bot, msg *common.Msg, action *bot.Action) {

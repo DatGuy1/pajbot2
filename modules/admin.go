@@ -23,11 +23,11 @@ var _ Module = (*Admin)(nil)
 
 // NewAdmin xD
 func NewAdmin() *Admin {
-	return &Admin{
-		BaseModule: basemodule.BaseModule{
-			ID: "admin",
-		},
+	m := Admin{
+		BaseModule: basemodule.NewBaseModule(),
 	}
+	m.ID = "admin"
+	return &m
 }
 
 func cmdJoinChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
