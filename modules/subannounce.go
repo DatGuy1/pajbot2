@@ -30,27 +30,12 @@ func NewSubAnnounce() *SubAnnounce {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "sub-announce"
+	m.EnabledDefault = true
 	return &m
-}
-
-func (module *SubAnnounce) parseSettings(jsonData []byte) {
-	type Alias SubAnnounce
-	/*
-		aux := struct {
-			*Alias
-		}{
-			Alias: (*Alias)(module),
-		}
-	*/
-	if err := json.Unmarshal(jsonData, module); err != nil {
-		log.Error(err)
-	}
 }
 
 // Init xD
 func (module *SubAnnounce) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("sub-announce")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	module.parseSettings(module.FetchSettings(bot.Redis, bot.Channel.Name))
@@ -100,4 +85,18 @@ func (module *SubAnnounce) Check(b *bot.Bot, m *common.Msg, action *bot.Action) 
 		}
 	}
 	return nil
+}
+
+func (module *SubAnnounce) parseSettings(jsonData []byte) {
+	type Alias SubAnnounce
+	/*
+		aux := struct {
+			*Alias
+		}{
+			Alias: (*Alias)(module),
+		}
+	*/
+	if err := json.Unmarshal(jsonData, module); err != nil {
+		log.Error(err)
+	}
 }

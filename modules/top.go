@@ -28,59 +28,12 @@ func NewTop() *Top {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "top"
+	m.EnabledDefault = true
 	return &m
-}
-
-func (module *Top) topPoints(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-	const limit = 5
-	const category = "points"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
-	result := []string{}
-	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.Points))
-	}
-	b.Sayf("Top %d %s: %s", limit, category, strings.Join(result, ", "))
-}
-
-func (module *Top) topSpammerOnline(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-	const limit = 5
-	const category = "online_message_count"
-	const categoryTitle = "online chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
-	result := []string{}
-	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OnlineMessageCount))
-	}
-	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
-}
-
-func (module *Top) topSpammerOffline(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-	const limit = 5
-	const category = "offline_message_count"
-	const categoryTitle = "offline chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
-	result := []string{}
-	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OfflineMessageCount))
-	}
-	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
-}
-func (module *Top) topSpammerTotal(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-	const limit = 5
-	const category = "total_message_count"
-	const categoryTitle = "chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
-	result := []string{}
-	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.TotalMessageCount))
-	}
-	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
 }
 
 // Init xD
 func (module *Top) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("top")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	topPointsCommand := &command.FuncCommand{
@@ -146,4 +99,51 @@ func (module *Top) DeInit(b *bot.Bot) {
 // Check xD
 func (module *Top) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
 	return module.commandHandler.Check(b, msg, action)
+}
+
+func (module *Top) topPoints(b *bot.Bot, msg *common.Msg, action *bot.Action) {
+	const limit = 5
+	const category = "points"
+	users := b.Redis.Top(b.Channel.Name, category, limit)
+	result := []string{}
+	for _, u := range users {
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.Points))
+	}
+	b.Sayf("Top %d %s: %s", limit, category, strings.Join(result, ", "))
+}
+
+func (module *Top) topSpammerOnline(b *bot.Bot, msg *common.Msg, action *bot.Action) {
+	const limit = 5
+	const category = "online_message_count"
+	const categoryTitle = "online chatter"
+	users := b.Redis.Top(b.Channel.Name, category, limit)
+	result := []string{}
+	for _, u := range users {
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OnlineMessageCount))
+	}
+	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
+}
+
+func (module *Top) topSpammerOffline(b *bot.Bot, msg *common.Msg, action *bot.Action) {
+	const limit = 5
+	const category = "offline_message_count"
+	const categoryTitle = "offline chatter"
+	users := b.Redis.Top(b.Channel.Name, category, limit)
+	result := []string{}
+	for _, u := range users {
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OfflineMessageCount))
+	}
+	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
+}
+
+func (module *Top) topSpammerTotal(b *bot.Bot, msg *common.Msg, action *bot.Action) {
+	const limit = 5
+	const category = "total_message_count"
+	const categoryTitle = "chatter"
+	users := b.Redis.Top(b.Channel.Name, category, limit)
+	result := []string{}
+	for _, u := range users {
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.TotalMessageCount))
+	}
+	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
 }

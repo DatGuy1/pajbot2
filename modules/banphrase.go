@@ -48,13 +48,12 @@ func NewBanphrase() *Banphrase {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "banphrase"
+	m.EnabledDefault = true
 	return &m
 }
 
 // Init xD
 func (module *Banphrase) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("banphrase")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	// load banned words and links

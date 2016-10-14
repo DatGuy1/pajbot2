@@ -37,7 +37,76 @@ func NewBingo() *Bingo {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "bingo"
+	m.EnabledDefault = true
 	return &m
+}
+
+// Init xD
+func (module *Bingo) Init(bot *bot.Bot) (string, bool) {
+	module.ParseState(bot.Redis, bot.Channel.Name)
+
+	numberCommand := &command.FuncCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"number",
+				"digit",
+				"num",
+			},
+			Level: 500,
+		},
+		Function: module.bingoNumber,
+	}
+	cancelCommand := &command.FuncCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"cancel",
+				"stop",
+			},
+			Level: 500,
+		},
+		Function: module.bingoCancel,
+	}
+	usageCommand := &command.FuncCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"usage",
+				"help",
+			},
+		},
+		Function: module.usageCommand,
+	}
+	bingoCommand := &command.NestedCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"bango",
+			},
+			Level: 500,
+		},
+		Commands: []command.Command{
+			usageCommand,
+			numberCommand,
+			cancelCommand,
+		},
+		DefaultCommand:  usageCommand,
+		FallbackCommand: usageCommand,
+	}
+	module.commandHandler.AddCommand(bingoCommand)
+
+	return "bingo", isModuleEnabled(bot, "bingo", false)
+}
+
+// DeInit xD
+func (module *Bingo) DeInit(b *bot.Bot) {
+
+}
+
+// Check xD
+func (module *Bingo) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
+	if bingoRunning {
+		bingoMessageChannel <- msg
+	}
+
+	return module.commandHandler.Check(b, msg, action)
 }
 
 func (module *Bingo) usageCommand(b *bot.Bot, msg *common.Msg, action *bot.Action) {
@@ -158,74 +227,4 @@ func (module *Bingo) topSpammerOffline(b *bot.Bot, msg *common.Msg, action *bot.
 }
 
 func (module *Bingo) topSpammerTotal(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-}
-
-// Init xD
-func (module *Bingo) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("bingo")
-	module.EnabledDefault = true
-	module.ParseState(bot.Redis, bot.Channel.Name)
-
-	numberCommand := &command.FuncCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"number",
-				"digit",
-				"num",
-			},
-			Level: 500,
-		},
-		Function: module.bingoNumber,
-	}
-	cancelCommand := &command.FuncCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"cancel",
-				"stop",
-			},
-			Level: 500,
-		},
-		Function: module.bingoCancel,
-	}
-	usageCommand := &command.FuncCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"usage",
-				"help",
-			},
-		},
-		Function: module.usageCommand,
-	}
-	bingoCommand := &command.NestedCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"bango",
-			},
-			Level: 500,
-		},
-		Commands: []command.Command{
-			usageCommand,
-			numberCommand,
-			cancelCommand,
-		},
-		DefaultCommand:  usageCommand,
-		FallbackCommand: usageCommand,
-	}
-	module.commandHandler.AddCommand(bingoCommand)
-
-	return "bingo", isModuleEnabled(bot, "bingo", false)
-}
-
-// DeInit xD
-func (module *Bingo) DeInit(b *bot.Bot) {
-
-}
-
-// Check xD
-func (module *Bingo) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
-	if bingoRunning {
-		bingoMessageChannel <- msg
-	}
-
-	return module.commandHandler.Check(b, msg, action)
 }

@@ -53,14 +53,6 @@ func NewBaseModule() BaseModule {
 	}
 }
 
-// SetDefaults sets the defaults values on the given module.
-func (m *BaseModule) SetDefaults(id string) {
-	m.EnabledDefault = false
-	m.LevelRequiredDefault = 100
-	m.LevelBypassDefault = -1
-	m.ID = id
-}
-
 // GetState xD
 func (m *BaseModule) GetState() *BaseModule {
 	return m

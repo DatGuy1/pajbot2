@@ -30,51 +30,12 @@ func NewCommand() *Command {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "command"
+	m.EnabledDefault = true
 	return &m
-}
-
-func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel common.Channel) int {
-	// Fetch rows from pb_command
-	rows, err := sql.Session.Query("SELECT id, channel_id, triggers, response, response_type FROM pb_command")
-
-	if err != nil {
-		log.Error("Error fetching commands:", err)
-		return 0
-	}
-
-	return module.readCommands(rows)
-}
-
-// loadCommand loads a command with a given ID
-func (module *Command) loadCommand(sql *sqlmanager.SQLManager, commandID int64) int {
-	// Fetch rows from pb_command
-	rows, err := sql.Session.Query("SELECT id, channel_id, triggers, response, response_type FROM pb_command WHERE `id`=?", commandID)
-
-	if err != nil {
-		log.Error("Error fetching commands:", err)
-		return 0
-	}
-
-	return module.readCommands(rows)
-}
-
-func (module *Command) readCommands(rows *sql.Rows) int {
-	numCommands := 0
-
-	for rows.Next() {
-		c := command.ReadSQLCommand(rows)
-		if c != nil {
-			module.commandHandler.AddCommand(c)
-			numCommands++
-		}
-	}
-	return numCommands
 }
 
 // Init initializes something
 func (module *Command) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("command")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	module.loadCommands(bot.SQL, bot.Channel)
@@ -302,4 +263,42 @@ func (module *Command) removeCommand(b *bot.Bot, msg *common.Msg, action *bot.Ac
 // Check xD
 func (module *Command) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
 	return module.commandHandler.Check(b, msg, action)
+}
+
+func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel common.Channel) int {
+	// Fetch rows from pb_command
+	rows, err := sql.Session.Query("SELECT id, channel_id, triggers, response, response_type FROM pb_command")
+
+	if err != nil {
+		log.Error("Error fetching commands:", err)
+		return 0
+	}
+
+	return module.readCommands(rows)
+}
+
+// loadCommand loads a command with a given ID
+func (module *Command) loadCommand(sql *sqlmanager.SQLManager, commandID int64) int {
+	// Fetch rows from pb_command
+	rows, err := sql.Session.Query("SELECT id, channel_id, triggers, response, response_type FROM pb_command WHERE `id`=?", commandID)
+
+	if err != nil {
+		log.Error("Error fetching commands:", err)
+		return 0
+	}
+
+	return module.readCommands(rows)
+}
+
+func (module *Command) readCommands(rows *sql.Rows) int {
+	numCommands := 0
+
+	for rows.Next() {
+		c := command.ReadSQLCommand(rows)
+		if c != nil {
+			module.commandHandler.AddCommand(c)
+			numCommands++
+		}
+	}
+	return numCommands
 }

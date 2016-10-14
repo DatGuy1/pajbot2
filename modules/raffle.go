@@ -33,33 +33,12 @@ func NewRaffle() *Raffle {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "raffle"
+	m.EnabledDefault = true
 	return &m
-}
-
-func (module *Raffle) getMinPoints() int {
-	if module.MinPoints == nil {
-		return 50
-	}
-
-	return int(*module.MinPoints)
-}
-
-func (module *Raffle) getMaxPoints() int {
-	if module.MaxPoints == nil {
-		return 50
-	}
-
-	return int(*module.MaxPoints)
-}
-
-func (module *Raffle) parseSettings(jsonData []byte) {
-	json.Unmarshal(jsonData, module)
 }
 
 // Init xD
 func (module *Raffle) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("raffle")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	module.bot = bot
@@ -187,4 +166,24 @@ func (module *Raffle) getWinners() ([]string, int) {
 		}
 	}
 	return winners, module.points / len(winners)
+}
+
+func (module *Raffle) getMinPoints() int {
+	if module.MinPoints == nil {
+		return 50
+	}
+
+	return int(*module.MinPoints)
+}
+
+func (module *Raffle) getMaxPoints() int {
+	if module.MaxPoints == nil {
+		return 50
+	}
+
+	return int(*module.MaxPoints)
+}
+
+func (module *Raffle) parseSettings(jsonData []byte) {
+	json.Unmarshal(jsonData, module)
 }

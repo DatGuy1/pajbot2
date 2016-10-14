@@ -27,13 +27,12 @@ func NewPyramid() *Pyramid {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "pyramid"
+	m.EnabledDefault = true
 	return &m
 }
 
 // Init xD
 func (module *Pyramid) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("pyramid")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	return "pyramid", isModuleEnabled(bot, "pyramid", true)

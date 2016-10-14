@@ -110,7 +110,32 @@ func NewRoulette() *Roulette {
 		},
 	}
 	m.ID = "roulette"
+	m.EnabledDefault = true
 	return &m
+}
+
+// Init xD
+func (module *Roulette) Init(bot *bot.Bot) (string, bool) {
+	module.ParseState(bot.Redis, bot.Channel.Name)
+
+	rouletteCommand := command.NewFuncCommand([]string{"roul"})
+	rouletteCommand.Function = module.cmdRoulette
+	rouletteCommand.Cooldown = time.Second * time.Duration(module.OnlineCooldown.Int())
+	rouletteCommand.UserCooldown = time.Second * time.Duration(module.OnlineUserCooldown.Int())
+
+	module.commandHandler.AddCommand(rouletteCommand)
+
+	return "roulette", isModuleEnabled(bot, "roulette", true)
+}
+
+// DeInit xD
+func (module *Roulette) DeInit(b *bot.Bot) {
+
+}
+
+// Check xD
+func (module *Roulette) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
+	return module.commandHandler.Check(b, msg, action)
 }
 
 // Check roulette
@@ -176,30 +201,4 @@ func (module *Roulette) runRoulette(b *bot.Bot, msg *common.Msg, points int) {
 		b.SayFormat(module.LoseMessage.String(), msg, points)
 	}
 
-}
-
-// Init xD
-func (module *Roulette) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("roulette")
-	module.EnabledDefault = true
-	module.ParseState(bot.Redis, bot.Channel.Name)
-
-	rouletteCommand := command.NewFuncCommand([]string{"roul"})
-	rouletteCommand.Function = module.cmdRoulette
-	rouletteCommand.Cooldown = time.Second * time.Duration(module.OnlineCooldown.Int())
-	rouletteCommand.UserCooldown = time.Second * time.Duration(module.OnlineUserCooldown.Int())
-
-	module.commandHandler.AddCommand(rouletteCommand)
-
-	return "roulette", isModuleEnabled(bot, "roulette", true)
-}
-
-// DeInit xD
-func (module *Roulette) DeInit(b *bot.Bot) {
-
-}
-
-// Check xD
-func (module *Roulette) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
-	return module.commandHandler.Check(b, msg, action)
 }

@@ -23,13 +23,12 @@ func NewPoints() *Points {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "points"
+	m.EnabledDefault = true
 	return &m
 }
 
 // Init xD
 func (module *Points) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("points")
-	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
 	return "points", isModuleEnabled(bot, "points", true)

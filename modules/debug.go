@@ -32,7 +32,31 @@ func NewDebug() *Debug {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "debug"
+	m.EnabledDefault = true
 	return &m
+}
+
+// Init xD
+func (module *Debug) Init(bot *bot.Bot) (string, bool) {
+	module.ParseState(bot.Redis, bot.Channel.Name)
+
+	myInfoCommand := command.NewFuncCommand([]string{"myinfo"})
+	myInfoCommand.Function = cmdMyInfo
+	myInfoCommand.Cooldown = time.Second * 2
+
+	module.commandHandler.AddCommand(myInfoCommand)
+
+	return "test", true
+}
+
+// DeInit xD
+func (module *Debug) DeInit(b *bot.Bot) {
+
+}
+
+// Check xD
+func (module *Debug) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
+	return module.commandHandler.Check(b, msg, action)
 }
 
 func cmdDebug(b *bot.Bot, msg *common.Msg, action *bot.Action) {
@@ -95,29 +119,4 @@ func cmdDebug(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 func cmdMyInfo(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	b.Mentionf(msg.User, "ID: %d, username: %s, type: %s, level: %d",
 		msg.User.ID, msg.User.DisplayName, msg.User.Type, msg.User.Level)
-}
-
-// Init xD
-func (module *Debug) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("debug")
-	module.EnabledDefault = true
-	module.ParseState(bot.Redis, bot.Channel.Name)
-
-	myInfoCommand := command.NewFuncCommand([]string{"myinfo"})
-	myInfoCommand.Function = cmdMyInfo
-	myInfoCommand.Cooldown = time.Second * 2
-
-	module.commandHandler.AddCommand(myInfoCommand)
-
-	return "test", true
-}
-
-// DeInit xD
-func (module *Debug) DeInit(b *bot.Bot) {
-
-}
-
-// Check xD
-func (module *Debug) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
-	return module.commandHandler.Check(b, msg, action)
 }

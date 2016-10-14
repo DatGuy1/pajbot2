@@ -27,7 +27,114 @@ func NewAdmin() *Admin {
 		BaseModule: basemodule.NewBaseModule(),
 	}
 	m.ID = "admin"
+	m.EnabledDefault = true
 	return &m
+}
+
+// Init xD
+func (module *Admin) Init(bot *bot.Bot) (string, bool) {
+	module.ParseState(bot.Redis, bot.Channel.Name)
+
+	testCommand := command.NestedCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"admin",
+			},
+			Level: 500,
+		},
+		Commands: []command.Command{
+			&command.FuncCommand{
+				BaseCommand: command.BaseCommand{
+					Triggers: []string{
+						"join",
+						"joinchannel",
+					},
+					Level: 500,
+				},
+				Function: cmdJoinChannel,
+			},
+			&command.FuncCommand{
+				BaseCommand: command.BaseCommand{
+					Triggers: []string{
+						"leave",
+						"part",
+						"leavechannel",
+						"partchannel",
+					},
+					Level: 500,
+				},
+				Function: cmdLeaveChannel,
+			},
+		},
+	}
+	module.commandHandler.AddCommand(&testCommand)
+
+	quitCommand := command.FuncCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"quit",
+				"exit",
+			},
+			Level: 500,
+		},
+		Function: cmdQuit,
+	}
+	module.commandHandler.AddCommand(&quitCommand)
+
+	moduleCommand := command.NestedCommand{
+		BaseCommand: command.BaseCommand{
+			Triggers: []string{
+				"module",
+			},
+			Level: 500,
+		},
+		Commands: []command.Command{
+			&command.FuncCommand{
+				BaseCommand: command.BaseCommand{
+					Triggers: []string{
+						"enable",
+					},
+					Level: 500,
+				},
+				Function: cmdModuleEnable,
+			},
+			&command.FuncCommand{
+				BaseCommand: command.BaseCommand{
+					Triggers: []string{
+						"disable",
+					},
+					Level: 500,
+				},
+				Function: cmdModuleDisable,
+			},
+			&command.FuncCommand{
+				BaseCommand: command.BaseCommand{
+					Triggers: []string{
+						"toggle",
+					},
+					Level: 500,
+				},
+				Function: cmdModuleToggle,
+			},
+		},
+	}
+
+	// TODO(pajlada): Add more module commands.
+	// !module reset <modulename>
+	// !module config <modulename> set <variable> <value>
+	module.commandHandler.AddCommand(&moduleCommand)
+
+	return "admin", true
+}
+
+// DeInit xD
+func (module *Admin) DeInit(b *bot.Bot) {
+
+}
+
+// Check xD
+func (module *Admin) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
+	return module.commandHandler.Check(b, msg, action)
 }
 
 func cmdJoinChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
@@ -197,113 +304,4 @@ func cmdModuleToggle(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 		b.EnableModule(module)
 		b.Sayf("%s, Successfully enabled module %s", msg.User.Name, moduleName)
 	}
-
-}
-
-// Init xD
-func (module *Admin) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("admin")
-	module.EnabledDefault = true
-	module.ParseState(bot.Redis, bot.Channel.Name)
-
-	testCommand := command.NestedCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"admin",
-			},
-			Level: 500,
-		},
-		Commands: []command.Command{
-			&command.FuncCommand{
-				BaseCommand: command.BaseCommand{
-					Triggers: []string{
-						"join",
-						"joinchannel",
-					},
-					Level: 500,
-				},
-				Function: cmdJoinChannel,
-			},
-			&command.FuncCommand{
-				BaseCommand: command.BaseCommand{
-					Triggers: []string{
-						"leave",
-						"part",
-						"leavechannel",
-						"partchannel",
-					},
-					Level: 500,
-				},
-				Function: cmdLeaveChannel,
-			},
-		},
-	}
-	module.commandHandler.AddCommand(&testCommand)
-
-	quitCommand := command.FuncCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"quit",
-				"exit",
-			},
-			Level: 500,
-		},
-		Function: cmdQuit,
-	}
-	module.commandHandler.AddCommand(&quitCommand)
-
-	moduleCommand := command.NestedCommand{
-		BaseCommand: command.BaseCommand{
-			Triggers: []string{
-				"module",
-			},
-			Level: 500,
-		},
-		Commands: []command.Command{
-			&command.FuncCommand{
-				BaseCommand: command.BaseCommand{
-					Triggers: []string{
-						"enable",
-					},
-					Level: 500,
-				},
-				Function: cmdModuleEnable,
-			},
-			&command.FuncCommand{
-				BaseCommand: command.BaseCommand{
-					Triggers: []string{
-						"disable",
-					},
-					Level: 500,
-				},
-				Function: cmdModuleDisable,
-			},
-			&command.FuncCommand{
-				BaseCommand: command.BaseCommand{
-					Triggers: []string{
-						"toggle",
-					},
-					Level: 500,
-				},
-				Function: cmdModuleToggle,
-			},
-		},
-	}
-
-	// TODO(pajlada): Add more module commands.
-	// !module reset <modulename>
-	// !module config <modulename> set <variable> <value>
-	module.commandHandler.AddCommand(&moduleCommand)
-
-	return "admin", true
-}
-
-// DeInit xD
-func (module *Admin) DeInit(b *bot.Bot) {
-
-}
-
-// Check xD
-func (module *Admin) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
-	return module.commandHandler.Check(b, msg, action)
 }

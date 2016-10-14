@@ -21,7 +21,6 @@ var _ Module = (*BroadcastEmotes)(nil)
 
 // Init xD
 func (module *BroadcastEmotes) Init(bot *bot.Bot) (string, bool) {
-	module.SetDefaults("test")
 	module.EnabledDefault = true
 	module.ParseState(bot.Redis, bot.Channel.Name)
 
