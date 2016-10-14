@@ -15,11 +15,21 @@ Top xD
 */
 type Top struct {
 	basemodule.BaseModule
+
 	commandHandler command.Handler
 }
 
 // Ensure the module implements the interface properly
 var _ Module = (*Top)(nil)
+
+// NewTop xD
+func NewTop() *Top {
+	return &Top{
+		BaseModule: basemodule.BaseModule{
+			ID: "top",
+		},
+	}
+}
 
 func (module *Top) topPoints(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	const limit = 5

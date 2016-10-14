@@ -42,6 +42,15 @@ const (
 // Ensure the module implements the interface properly
 var _ Module = (*Banphrase)(nil)
 
+// NewBanphrase xD
+func NewBanphrase() *Banphrase {
+	return &Banphrase{
+		BaseModule: basemodule.BaseModule{
+			ID: "banphrase",
+		},
+	}
+}
+
 // Init xD
 func (module *Banphrase) Init(bot *bot.Bot) (string, bool) {
 	module.SetDefaults("banphrase")

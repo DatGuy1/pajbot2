@@ -15,11 +15,21 @@ Emotes xD
 */
 type Emotes struct {
 	basemodule.BaseModule
+
 	commandHandler command.Handler
 }
 
 // Ensure the module implements the interface properly
 var _ Module = (*Emotes)(nil)
+
+// NewEmotes xD
+func NewEmotes() *Emotes {
+	return &Emotes{
+		BaseModule: basemodule.BaseModule{
+			ID: "emotes",
+		},
+	}
+}
 
 func (module *Emotes) ffzEmotes(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	var activeEmotes []string

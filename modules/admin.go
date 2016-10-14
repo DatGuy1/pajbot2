@@ -21,6 +21,15 @@ type Admin struct {
 // Ensure the module implements the interface properly
 var _ Module = (*Admin)(nil)
 
+// NewAdmin xD
+func NewAdmin() *Admin {
+	return &Admin{
+		BaseModule: basemodule.BaseModule{
+			ID: "admin",
+		},
+	}
+}
+
 func cmdJoinChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	m := helper.GetTriggersN(msg.Text, 2)
 

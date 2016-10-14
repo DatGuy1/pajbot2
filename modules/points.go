@@ -17,6 +17,15 @@ type Points struct {
 
 var _ Module = (*Points)(nil)
 
+// NewPoints xD
+func NewPoints() *Points {
+	return &Points{
+		BaseModule: basemodule.BaseModule{
+			ID: "points",
+		},
+	}
+}
+
 // Init xD
 func (module *Points) Init(bot *bot.Bot) (string, bool) {
 	module.SetDefaults("points")

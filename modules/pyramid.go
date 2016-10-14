@@ -13,12 +13,22 @@ import (
 // Pyramid module from pajbot 1
 type Pyramid struct {
 	basemodule.BaseModule
+
 	data      [][]string
 	goingDown bool
 }
 
 // Ensure the module implements the interface properly
 var _ Module = (*Pyramid)(nil)
+
+// NewPyramid xD
+func NewPyramid() *Pyramid {
+	return &Pyramid{
+		BaseModule: basemodule.BaseModule{
+			ID: "pyramid",
+		},
+	}
+}
 
 // Init xD
 func (module *Pyramid) Init(bot *bot.Bot) (string, bool) {

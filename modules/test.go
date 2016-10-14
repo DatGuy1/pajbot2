@@ -28,6 +28,15 @@ type Test struct {
 // Ensure the module implements the interface properly
 var _ Module = (*Test)(nil)
 
+// NewTest xD
+func NewTest() *Test {
+	return &Test{
+		BaseModule: basemodule.BaseModule{
+			ID: "test",
+		},
+	}
+}
+
 func cmdTest(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	m := helper.GetTriggersN(msg.Text, 1)
 

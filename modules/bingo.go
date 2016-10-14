@@ -23,12 +23,22 @@ Bingo xD
 */
 type Bingo struct {
 	basemodule.BaseModule
+
 	commandHandler command.Handler
 	activeBingos   map[string]*activeBingo
 }
 
 // Ensure the module implements the interface properly
 var _ Module = (*Bingo)(nil)
+
+// NewBingo xD
+func NewBingo() *Bingo {
+	return &Bingo{
+		BaseModule: basemodule.BaseModule{
+			ID: "bingo",
+		},
+	}
+}
 
 func (module *Bingo) usageCommand(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	b.Say("Usage: !bango type reward. Valid types: twitch/bttv/number")

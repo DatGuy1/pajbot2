@@ -19,26 +19,25 @@ func modulesInit(b *bot.Bot) {
 	//                via a redis json list or something
 	if b.Channel.Name == "nymn_hs" {
 		b.AllModules = []bot.Module{
-			&modules.Admin{},
-			&modules.Debug{},
-			&modules.Emotes{},
+			modules.NewAdmin(),
 			modules.NewDebug(),
+			modules.NewEmotes(),
 		}
 	} else {
 		b.AllModules = []bot.Module{
-			&modules.Admin{},
-			&modules.Banphrase{},
-			&modules.Bingo{},
-			&modules.Command{},
-			&modules.Emotes{},
-			&modules.Points{},
-			&modules.Pyramid{},
-			&modules.Raffle{},
-			&modules.SubAnnounce{},
-			&modules.Test{},
-			&modules.Top{},
+			modules.NewAdmin(),
+			modules.NewBanphrase(),
+			modules.NewBingo(),
+			modules.NewCommand(),
 			modules.NewDebug(),
+			modules.NewEmotes(),
+			modules.NewPoints(),
+			modules.NewPyramid(),
+			modules.NewRaffle(),
 			modules.NewRoulette(),
+			modules.NewSubAnnounce(),
+			modules.NewTest(),
+			modules.NewTop(),
 		}
 	}
 }

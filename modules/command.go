@@ -17,11 +17,21 @@ Command xD
 */
 type Command struct {
 	basemodule.BaseModule
+
 	commandHandler command.Handler
 }
 
 // Ensure the module implements the interface properly
 var _ Module = (*Command)(nil)
+
+// NewCommand xD
+func NewCommand() *Command {
+	return &Command{
+		BaseModule: basemodule.BaseModule{
+			ID: "command",
+		},
+	}
+}
 
 func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel common.Channel) int {
 	// Fetch rows from pb_command

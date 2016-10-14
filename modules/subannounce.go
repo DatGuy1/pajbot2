@@ -24,6 +24,15 @@ type SubAnnounce struct {
 // Ensure the module implements the interface properly
 var _ Module = (*SubAnnounce)(nil)
 
+// NewSubAnnounce xD
+func NewSubAnnounce() *SubAnnounce {
+	return &SubAnnounce{
+		BaseModule: basemodule.BaseModule{
+			ID: "sub-announce",
+		},
+	}
+}
+
 func (module *SubAnnounce) parseSettings(jsonData []byte) {
 	type Alias SubAnnounce
 	/*

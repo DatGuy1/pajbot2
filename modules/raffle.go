@@ -24,6 +24,18 @@ type Raffle struct {
 	MaxPoints *int64 `json:"max_points"`
 }
 
+// Ensure the module implements the interface properly
+var _ Module = (*Raffle)(nil)
+
+// NewRaffle xD
+func NewRaffle() *Raffle {
+	return &Raffle{
+		BaseModule: basemodule.BaseModule{
+			ID: "raffle",
+		},
+	}
+}
+
 func (module *Raffle) getMinPoints() int {
 	if module.MinPoints == nil {
 		return 50
