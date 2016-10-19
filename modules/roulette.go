@@ -14,6 +14,7 @@ import (
 // Roulette module
 type Roulette struct {
 	basemodule.BaseModule
+
 	commandHandler command.Handler
 
 	// Settings
@@ -42,54 +43,54 @@ func NewRoulette() *Roulette {
 	m := Roulette{
 		BaseModule: basemodule.NewBaseModule(),
 		WinMessage: StringSetting{
-			Label:        `Win message | %d = Points bet`,
-			DefaultValue: `$(source.name) won %d points in roulette and now has $(source.points) points! FeelsGoodMan`,
-			MinLength:    10,
-			MaxLength:    400,
+			Label:     `Win message | %d = Points bet`,
+			Value:     `$(source.name) won %d points in roulette and now has $(source.points) points! FeelsGoodMan`,
+			MinLength: 10,
+			MaxLength: 400,
 		},
 		LoseMessage: StringSetting{
-			Label:        `Lose message | %d = Points bet`,
-			DefaultValue: `$(source.name) lost %d points in roulette and now has $(source.points) points! FeelsBadMan`,
-			MinLength:    10,
-			MaxLength:    400,
+			Label:     `Lose message | %d = Points bet`,
+			Value:     `$(source.name) lost %d points in roulette and now has $(source.points) points! FeelsBadMan`,
+			MinLength: 10,
+			MaxLength: 400,
 		},
 		WinPercentage: IntSetting{
-			Label:        `Win % chance: 0-100`,
-			DefaultValue: 50,
-			MinValue:     0,
-			MaxValue:     100,
+			Label:    `Win % chance: 0-100`,
+			Value:    50,
+			MinValue: 0,
+			MaxValue: 100,
 		},
 		OnlineCooldown: IntSetting{
-			Label:        `Online global cooldown (seconds)`,
-			DefaultValue: 0,
-			MinValue:     0,
-			MaxValue:     600,
+			Label:    `Online global cooldown (seconds)`,
+			Value:    0,
+			MinValue: 0,
+			MaxValue: 600,
 		},
 		OnlineUserCooldown: IntSetting{
-			Label:        `Online user cooldown (seconds)`,
-			DefaultValue: 60,
-			MinValue:     0,
-			MaxValue:     600,
+			Label:    `Online user cooldown (seconds)`,
+			Value:    60,
+			MinValue: 0,
+			MaxValue: 600,
 		},
 		MinimumBet: IntSetting{
-			Label:        `Minimum roulette bet`,
-			DefaultValue: 1,
-			MinValue:     1,
-			MaxValue:     50000,
+			Label:    `Minimum roulette bet`,
+			Value:    1,
+			MinValue: 1,
+			MaxValue: 50000,
 		},
 		MaximumBet: IntSetting{
-			Label:        `Maximum roulette bet`,
-			DefaultValue: -1,
-			MinValue:     -1,
-			MaxValue:     50000000,
+			Label:    `Maximum roulette bet`,
+			Value:    -1,
+			MinValue: -1,
+			MaxValue: 50000000,
 		},
 		CanWhisper: BoolSetting{
-			Label:        `Can roulette in whisper`,
-			DefaultValue: false,
+			Label: `Can roulette in whisper`,
+			Value: false,
 		},
 		OutputType: OptionSetting{
-			Label:        `Result output type`,
-			DefaultValue: 0,
+			Label: `Result output type`,
+			Value: 0,
 			Options: []string{
 				`Show results in chat`,
 				`Show results in whispers`,
@@ -97,16 +98,16 @@ func NewRoulette() *Roulette {
 			},
 		},
 		MinimumShowPoints: IntSetting{
-			Label:        `Minimum points you need to bet to have the results show up in chat (with option 3)`,
-			DefaultValue: 100,
-			MinValue:     1,
-			MaxValue:     150000,
+			Label:    `Minimum points you need to bet to have the results show up in chat (with option 3)`,
+			Value:    100,
+			MinValue: 1,
+			MaxValue: 150000,
 		},
 		OnlyAllowRouletteAfterSub: IntSetting{
-			Label:        `Only allow roulette after subbing (-1 = off, rest = time in seconds people can roulette after a sub occurs)`,
-			DefaultValue: -1,
-			MinValue:     -1,
-			MaxValue:     600,
+			Label:    `Only allow roulette after subbing (-1 = off, rest = time in seconds people can roulette after a sub occurs)`,
+			Value:    -1,
+			MinValue: -1,
+			MaxValue: 600,
 		},
 	}
 	m.ID = "roulette"
@@ -117,6 +118,7 @@ func NewRoulette() *Roulette {
 // Init xD
 func (module *Roulette) Init(bot *bot.Bot) (string, bool) {
 	module.ParseState(bot.Redis, bot.Channel.Name)
+	LoadSettings(bot.Redis, bot.Channel.Name, module)
 
 	rouletteCommand := command.NewFuncCommand([]string{"roul"})
 	rouletteCommand.Function = module.cmdRoulette
@@ -200,5 +202,4 @@ func (module *Roulette) runRoulette(b *bot.Bot, msg *common.Msg, points int) {
 		user.Points -= points
 		b.SayFormat(module.LoseMessage.String(), msg, points)
 	}
-
 }
