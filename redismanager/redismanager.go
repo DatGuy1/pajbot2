@@ -43,7 +43,7 @@ func Init(config *config.Config) *RedisManager {
 // Only globally banned users and admins have a level in global redis
 func (r *RedisManager) UpdateGlobalUser(channel string, user *common.User, u *common.GlobalUser) {
 	conn := r.Pool.Get()
-	conn.Send("HSET", "global:lastactive", user.Name, time.Now().Unix())
+	conn.Send("HSET", "global:last_active", user.Name, time.Now().Unix())
 
 	// Don't update the channel if the channel is empty (i.e. a whisper)
 	if channel != "" {
@@ -57,11 +57,11 @@ func (r *RedisManager) UpdateGlobalUser(channel string, user *common.User, u *co
 func (r *RedisManager) GetGlobalUser(channel string, user *common.User, u *common.GlobalUser) {
 	conn := r.Pool.Get()
 	defer conn.Close()
-	exist, err := conn.Do("HEXISTS", "global:lastactive", user.Name)
+	exist, err := conn.Do("HEXISTS", "global:last_active", user.Name)
 	e, _ := redis.Bool(exist, err)
 	if e {
 		conn.Send("HGET", "global:level", user.Name)
-		conn.Send("HGET", "global:lastactive", user.Name)
+		conn.Send("HGET", "global:last_active", user.Name)
 		conn.Send("HGET", "global:channel", user.Name)
 		conn.Flush()
 		// can this be done in a loop somehow?
@@ -91,7 +91,7 @@ func (r *RedisManager) IsValidUser(channel string, _user string) bool {
 	conn := r.Pool.Get()
 	defer conn.Close()
 	user := strings.ToLower(_user)
-	res, err := redis.Bool(conn.Do("HEXISTS", channel+":users:lastseen", user))
+	res, err := redis.Bool(conn.Do("HEXISTS", channel+":users:last_seen", user))
 	if err != nil {
 		log.Error(err)
 	}
@@ -117,7 +117,7 @@ func (r *RedisManager) IncrPoints(channel string, user string, incrby int) {
 func (r *RedisManager) newUser(channel string, user *common.User) {
 	conn := r.Pool.Get()
 	defer conn.Close()
-	conn.Send("HSET", channel+":users:lastseen", user.Name, time.Now().Unix())
+	conn.Send("HSET", channel+":users:last_seen", user.Name, time.Now().Unix())
 	conn.Send("ZADD", channel+":users:points", user.Points, user.Name)
 
 	// Why is this called?
@@ -149,8 +149,8 @@ func (r *RedisManager) UpdateUser(channel string, user *common.User, oldUser *co
 	if user.Name == channel {
 		r.SetLevel(channel, user, 1500)
 	}
-	conn.Send("HSET", channel+":users:lastseen", user.Name, time.Now().Unix())
-	conn.Send("HSET", channel+":users:lastactive", user.Name, time.Now().Unix())
+	conn.Send("HSET", channel+":users:last_seen", user.Name, time.Now().Unix())
+	conn.Send("HSET", channel+":users:last_active", user.Name, time.Now().Unix())
 
 	// Update total message count if needed
 	if user.TotalMessageCount != oldUser.TotalMessageCount {
@@ -192,12 +192,12 @@ func (r *RedisManager) LoadUser(channel string, user string) common.User {
 func (r *RedisManager) GetUser(channel string, user *common.User) {
 	conn := r.Pool.Get()
 	defer conn.Close()
-	exist, err := conn.Do("HEXISTS", channel+":users:lastseen", user.Name)
+	exist, err := conn.Do("HEXISTS", channel+":users:last_seen", user.Name)
 	e, _ := redis.Bool(exist, err)
 	if e {
 		conn.Send("HGET", channel+":users:level", user.Name)
 		conn.Send("ZSCORE", channel+":users:points", user.Name)
-		conn.Send("HGET", channel+":users:lastseen", user.Name)
+		conn.Send("HGET", channel+":users:last_seen", user.Name)
 		conn.Send("ZSCORE", channel+":users:total_message_count", user.Name)
 		conn.Send("ZSCORE", channel+":users:online_message_count", user.Name)
 		conn.Send("ZSCORE", channel+":users:offline_message_count", user.Name)
@@ -212,8 +212,8 @@ func (r *RedisManager) GetUser(channel string, user *common.User) {
 		user.Points, _ = redis.Int(res, err)
 		// LastSeen
 		res, err = conn.Receive()
-		lastseen, _ := redis.String(res, err)
-		user.LastSeen, _ = time.Parse(time.UnixDate, lastseen)
+		lastSeen, _ := redis.String(res, err)
+		user.LastSeen, _ = time.Parse(time.UnixDate, lastSeen)
 		// TotalMessageCount
 		res, err = conn.Receive()
 		user.TotalMessageCount, _ = redis.Int(res, err)
