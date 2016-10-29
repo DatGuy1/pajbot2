@@ -95,7 +95,7 @@ func (c *Channel) InsertNewToSQL(sql *sqlmanager.SQLManager) error {
 	stmt, err := sql.Session.Prepare(queryF)
 	if err != nil {
 		// XXX
-		log.Fatal(err)
+		log.Error(err)
 		return err
 	}
 
@@ -103,7 +103,7 @@ func (c *Channel) InsertNewToSQL(sql *sqlmanager.SQLManager) error {
 
 	if err != nil {
 		// XXX
-		log.Fatal(err)
+		log.Error(err)
 		return err
 	}
 	return nil

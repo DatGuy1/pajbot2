@@ -325,7 +325,6 @@ func InitIRCConnection(config IRCConfig, botAccount common.DBUser) *Irc {
 		}
 
 		if !channel.Enabled {
-			log.Debugf("Skipping %s cuz not enabled", channel.Name)
 			continue
 		}
 
@@ -333,12 +332,16 @@ func InitIRCConnection(config IRCConfig, botAccount common.DBUser) *Irc {
 	}
 
 	if !hasOwnChannel {
+		log.Debugf("Creating own channel for %s", botAccount.Name)
 		// Create our own channel, then use InsertNewToSQL
 		ownChannel := &common.Channel{
 			Name:  botAccount.Name,
 			BotID: botAccount.ID,
 		}
-		ownChannel.InsertNewToSQL(irc.SQL)
+		err := ownChannel.InsertNewToSQL(irc.SQL)
+		if err != nil {
+			log.Debugf("Error creating channel!")
+		}
 
 		irc.join <- ownChannel.Name
 	}
