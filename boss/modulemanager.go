@@ -17,7 +17,7 @@ func modulesUnload(b *bot.Bot) {
 func modulesInit(b *bot.Bot) {
 	// TODO(pajlada): Select which modules should be loaded
 	//                via a redis json list or something
-	if b.Channel.Name == "nymn_hs" {
+	if b.Channel.Name == "nymn_hs" || b.Channel.Name == "forsenlol" {
 		b.AllModules = []bot.Module{
 			modules.NewAdmin(),
 			modules.NewDebug(),
