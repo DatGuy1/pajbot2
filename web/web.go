@@ -64,6 +64,7 @@ func Init(config *config.Config, webCfg *Config) *Boss {
 		"channel_check_subscription",
 		"channel_feed_read",
 		"channel_feed_edit",
+		"channel_editor",
 	}
 	twitchUserOauthConfig.Endpoint = oauth2.Endpoint{
 		AuthURL:  "https://api.twitch.tv/kraken/oauth2/authorize",
