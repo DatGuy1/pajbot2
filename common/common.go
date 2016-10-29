@@ -52,12 +52,29 @@ Msg contains all the information about an IRC message.
 This included already-parsed ircv3-tags and the User object
 */
 type Msg struct {
-	User    User
-	Text    string
+	// User who sent the message, or user who the message is about
+	User User
+
+	// Text contains the text of the message, i.e. the text someone sent in chat or the resub message
+	Text string
+
+	// Channel the message was sent in
 	Channel string
-	Type    MsgType // PRIVMSG , WHISPER, (SUB?)
-	Me      bool
-	Emotes  []Emote
-	Tags    map[string]string
-	Args    []string // needed for bot.Format for now
+
+	// Type of message (PRIVMSG, WHISPER, SUB, RESUB?)
+	Type MsgType
+
+	// If the message is a /me message
+	Me bool
+
+	// List of emotes contained in the message
+	// XXX(pajlada): Not sure if they're sorted
+	Emotes []Emote
+
+	// All remaining unparsed ircv3-tags
+	Tags map[string]string
+
+	// Used to send along arguments about the user (what direction?)
+	// used in bot.Format
+	Args []string
 }
