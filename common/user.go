@@ -4,14 +4,25 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/garyburd/redigo/redis"
 )
 
-// User xD
+// User defines a user as parsed directly from an IRC message
+// TODO: the TotalMessageCount etc should probably be moved
+// - OnlineMessageCount: MOVE
+// - OfflineMessageCount: MOVE
+// We should instead contain an object with RedisUser
 type User struct {
-	ID                  int
-	Name                string
-	DisplayName         string
+	// I don't know what this ID is. User ID from TMI?
+	ID int
+
+	// Name in full lower case, also known as "login name"
+	Name string
+
+	// Name in variable case, also known as "international name" or "nick name"
+	DisplayName string
+
 	Mod                 bool
 	Sub                 bool
 	Turbo               bool
@@ -22,8 +33,9 @@ type User struct {
 	OnlineMessageCount  int
 	OfflineMessageCount int
 	Points              int
-	LastSeen            time.Time // should this be time.Time or int/float?
-	LastActive          time.Time
+
+	// Data stores
+	RedisUser redisUser
 }
 
 const noPing = string("\u05C4")
@@ -31,6 +43,11 @@ const noPing = string("\u05C4")
 // NameNoPing xD
 func (u *User) NameNoPing() string {
 	return string(u.DisplayName[0]) + noPing + u.DisplayName[1:]
+}
+
+// LoadRedisUser loads the redis user associated with this IRC user
+func (u *User) LoadRedisUser(pool *redis.Pool, channel string) {
+	LoadRedisUser(pool, channel, u.Name, &u.RedisUser)
 }
 
 // GetPoints returns a point amount relative to the user with the given arg.

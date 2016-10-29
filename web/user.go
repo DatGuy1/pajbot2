@@ -1,9 +1,6 @@
 package web
 
-import (
-	"strings"
-	"time"
-)
+import "strings"
 
 func getUserPayload(channel, username string) interface{} {
 	username = strings.ToLower(username)
@@ -19,7 +16,7 @@ func getUserPayload(channel, username string) interface{} {
 		TotalMessageCount:   int64(u.TotalMessageCount),
 		OfflineMessageCount: int64(u.OfflineMessageCount),
 		OnlineMessageCount:  int64(u.OnlineMessageCount),
-		LastSeen:            u.LastSeen.Format(time.UnixDate),
-		LastActive:          u.LastActive.Format(time.UnixDate),
+		// LastSeen:            u.LastSeen.Format(time.UnixDate),
+		// LastActive: u.LastActive.Format(time.UnixDate),
 	}
 }

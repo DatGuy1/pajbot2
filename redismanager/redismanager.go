@@ -61,7 +61,6 @@ func (r *RedisManager) GetGlobalUser(channel string, user *common.User, u *commo
 	e, _ := redis.Bool(exist, err)
 	if e {
 		conn.Send("HGET", "global:level", user.Name)
-		conn.Send("HGET", "global:last_active", user.Name)
 		conn.Send("HGET", "global:channel", user.Name)
 		conn.Flush()
 		// can this be done in a loop somehow?
@@ -72,10 +71,6 @@ func (r *RedisManager) GetGlobalUser(channel string, user *common.User, u *commo
 			// XXX: Should this set u.Level instead? not sure!
 			user.Level = level
 		}
-		// LastActive
-		res, err = conn.Receive()
-		t, _ := redis.String(res, err)
-		u.LastActive, _ = time.Parse(time.UnixDate, t)
 		// Channel
 		res, err = conn.Receive()
 		u.Channel, _ = redis.String(res, err)
@@ -197,7 +192,6 @@ func (r *RedisManager) GetUser(channel string, user *common.User) {
 	if e {
 		conn.Send("HGET", channel+":users:level", user.Name)
 		conn.Send("ZSCORE", channel+":users:points", user.Name)
-		conn.Send("HGET", channel+":users:last_seen", user.Name)
 		conn.Send("ZSCORE", channel+":users:total_message_count", user.Name)
 		conn.Send("ZSCORE", channel+":users:online_message_count", user.Name)
 		conn.Send("ZSCORE", channel+":users:offline_message_count", user.Name)
@@ -210,10 +204,6 @@ func (r *RedisManager) GetUser(channel string, user *common.User) {
 		// Points
 		res, err = conn.Receive()
 		user.Points, _ = redis.Int(res, err)
-		// LastSeen
-		res, err = conn.Receive()
-		lastSeen, _ := redis.String(res, err)
-		user.LastSeen, _ = time.Parse(time.UnixDate, lastSeen)
 		// TotalMessageCount
 		res, err = conn.Receive()
 		user.TotalMessageCount, _ = redis.Int(res, err)
