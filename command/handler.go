@@ -59,7 +59,7 @@ func (h *Handler) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error {
 		bc := c.GetBaseCommand()
 		if bc.Level > msg.User.Level {
 			log.Warningf("%s tried to use %s, which requires level %d (he is level %d)",
-				msg.User.DisplayName, strings.Join(m, " "), bc.Level, msg.User.Level)
+				msg.User.DisplayName(), strings.Join(m, " "), bc.Level, msg.User.Level)
 			return nil
 		}
 		if c.OnCooldown(&msg.User) {

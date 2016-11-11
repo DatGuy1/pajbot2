@@ -8,10 +8,16 @@ Handle attempts to handle the given message
 func (b *Bot) Handle(msg common.Msg) {
 	b.parseEmotes(&msg)
 	common.ParseEmojis(&msg)
-	oldUser := msg.User
-	defer b.Redis.UpdateUser(b.Channel.Name, &msg.User, &oldUser)
+
+	// Load redis data
+	msg.User.LoadData(b.Redis.Pool, b.Channel.Name)
+
+	// Copy user redis object
+	oldUser := msg.User.RedisData
+
+	defer msg.User.RedisData.Close(&oldUser)
 	action := &Action{}
-	// log.Debugf("%s # %s :%s", msg.Channel, msg.User.DisplayName, msg.Text)
+	// log.Debugf("%s # %s :%s", msg.Channel, msg.User.DisplayName(), msg.Text)
 	for _, module := range b.EnabledModules {
 		// If user level is above module bypass level
 		//   then don't call Check here
@@ -28,10 +34,5 @@ func (b *Bot) Handle(msg common.Msg) {
 		}
 	}
 
-	if b.Channel.Online {
-		msg.User.OnlineMessageCount++
-	} else {
-		msg.User.OfflineMessageCount++
-	}
-	msg.User.TotalMessageCount++
+	msg.User.IncrLines(b.Channel.Online)
 }

@@ -63,8 +63,7 @@ func (module *Points) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) err
 		msg.Args = args
 		b.SaySafe(b.Format("$(user.name) has $(user.points) points KKaper", msg))
 	case "!resetpts":
-		msg.User.Points = 0
-		b.Redis.SetPoints(msg.Channel, &msg.User)
+		msg.User.RedisData.Points = 0
 	}
 
 	return nil

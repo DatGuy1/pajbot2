@@ -83,7 +83,7 @@ func (module *Pyramid) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) er
 						}
 						if peakLen > 2 {
 							b.SaySafef("%s just finished a %d width %s pyramid PogChamp //",
-								msg.User.DisplayName,
+								msg.User.DisplayName(),
 								peakLen,
 								pyramidThing)
 						}

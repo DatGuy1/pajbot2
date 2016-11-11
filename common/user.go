@@ -9,10 +9,6 @@ import (
 )
 
 // User defines a user as parsed directly from an IRC message
-// TODO: the TotalMessageCount etc should probably be moved
-// - OnlineMessageCount: MOVE
-// - OfflineMessageCount: MOVE
-// We should instead contain an object with RedisUser
 type User struct {
 	// I don't know what this ID is. User ID from TMI?
 	ID int
@@ -21,33 +17,54 @@ type User struct {
 	Name string
 
 	// Name in variable case, also known as "international name" or "nick name"
-	DisplayName string
+	IRCDisplayName string `json:"DisplayName"`
 
-	Mod                 bool
-	Sub                 bool
-	Turbo               bool
-	ChannelOwner        bool
-	Type                string // admin , staff etc
-	Level               int
-	TotalMessageCount   int
-	OnlineMessageCount  int
-	OfflineMessageCount int
-	Points              int
+	Mod          bool
+	Sub          bool
+	Turbo        bool
+	ChannelOwner bool
+	Type         string // admin , staff etc
+	Level        int
 
 	// Data stores
-	RedisUser redisUser
+	RedisData RedisUser
 }
 
 const noPing = string("\u05C4")
 
-// NameNoPing xD
-func (u *User) NameNoPing() string {
-	return string(u.DisplayName[0]) + noPing + u.DisplayName[1:]
+// DisplayName xD
+func (u *User) DisplayName() string {
+	if u.IRCDisplayName == "" {
+		if u.RedisData.DisplayName == "" {
+			return u.Name
+		}
+
+		return u.RedisData.DisplayName
+	}
+
+	return u.IRCDisplayName
 }
 
-// LoadRedisUser loads the redis user associated with this IRC user
-func (u *User) LoadRedisUser(pool *redis.Pool, channel string) {
-	LoadRedisUser(pool, channel, u.Name, &u.RedisUser)
+// NameNoPing xD
+func (u *User) NameNoPing() string {
+	displayName := u.DisplayName()
+	return string(displayName[0]) + noPing + displayName[1:]
+}
+
+// LoadData loads the redis user associated with this IRC user
+// Name is required to be set
+func (u *User) LoadData(pool *redis.Pool, channel string) {
+	LoadRedisUser(pool, channel, u.Name, &u.RedisData)
+
+	if u.IRCDisplayName != "" {
+		u.RedisData.DisplayName = u.IRCDisplayName
+	}
+}
+
+// LoadDataConn loads the redis user associated with this IRC user
+// Name is required to be set
+func (u *User) LoadDataConn(conn redis.Conn, channel string) {
+	LoadRedisUserConn(conn, channel, u.Name, &u.RedisData)
 }
 
 // GetPoints returns a point amount relative to the user with the given arg.
@@ -58,7 +75,7 @@ func (u *User) LoadRedisUser(pool *redis.Pool, channel string) {
 func (u *User) GetPoints(arg string) (int, error) {
 	if arg == "all" || arg == "allin" {
 		// Return all points
-		return u.Points, nil
+		return u.RedisData.Points, nil
 	}
 
 	var bet int
@@ -69,7 +86,7 @@ func (u *User) GetPoints(arg string) (int, error) {
 			log.Error(err)
 			return 0, fmt.Errorf(`Invalid argument to GetPoints (using %%)`)
 		}
-		fpoints := float64(u.Points)
+		fpoints := float64(u.RedisData.Points)
 		bet = int(fpoints * (_bet / 100))
 	} else {
 		_bet, err := strconv.ParseInt(arg, 10, 64)
@@ -80,10 +97,20 @@ func (u *User) GetPoints(arg string) (int, error) {
 	}
 
 	/*
-		if bet > u.Points {
+		if bet > u.RedisData.Points {
 			return 0, fmt.Errorf("User does not have this many points")
 		}
 	*/
 
 	return bet, nil
+}
+
+// IncrLines increases lines for the user KKona
+func (u *User) IncrLines(channelOnline bool) {
+	if channelOnline {
+		u.RedisData.OnlineMessageCount++
+	} else {
+		u.RedisData.OfflineMessageCount++
+	}
+	u.RedisData.TotalMessageCount++
 }

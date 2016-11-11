@@ -104,10 +104,10 @@ func (module *Top) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error 
 func (module *Top) topPoints(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	const limit = 5
 	const category = "points"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
 	result := []string{}
+	users := b.Redis.Top(b.Channel.Name, category, limit)
 	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.Points))
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.RedisData.Points))
 	}
 	b.Sayf("Top %d %s: %s", limit, category, strings.Join(result, ", "))
 }
@@ -116,10 +116,10 @@ func (module *Top) topSpammerOnline(b *bot.Bot, msg *common.Msg, action *bot.Act
 	const limit = 5
 	const category = "online_message_count"
 	const categoryTitle = "online chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
 	result := []string{}
+	users := b.Redis.Top(b.Channel.Name, category, limit)
 	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OnlineMessageCount))
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.RedisData.OnlineMessageCount))
 	}
 	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
 }
@@ -128,10 +128,10 @@ func (module *Top) topSpammerOffline(b *bot.Bot, msg *common.Msg, action *bot.Ac
 	const limit = 5
 	const category = "offline_message_count"
 	const categoryTitle = "offline chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
 	result := []string{}
+	users := b.Redis.Top(b.Channel.Name, category, limit)
 	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.OfflineMessageCount))
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.RedisData.OfflineMessageCount))
 	}
 	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
 }
@@ -140,10 +140,10 @@ func (module *Top) topSpammerTotal(b *bot.Bot, msg *common.Msg, action *bot.Acti
 	const limit = 5
 	const category = "total_message_count"
 	const categoryTitle = "chatter"
-	users := b.Redis.Top(b.Channel.Name, category, limit)
 	result := []string{}
+	users := b.Redis.Top(b.Channel.Name, category, limit)
 	for _, u := range users {
-		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.TotalMessageCount))
+		result = append(result, fmt.Sprintf("%s: %d", u.NameNoPing(), u.RedisData.TotalMessageCount))
 	}
 	b.Sayf("Top %d %s: %s", limit, categoryTitle, strings.Join(result, ", "))
 }

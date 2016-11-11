@@ -112,10 +112,8 @@ func getEmoteName(m *common.Msg, pos string) string {
 func parseTagValues(m *common.Msg) {
 	// TODO: Parse id and color
 	// color and id is pretty useless imo
-	if m.Tags["display-name"] == "" {
-		m.User.DisplayName = m.User.Name
-	} else {
-		m.User.DisplayName = m.Tags["display-name"]
+	if m.Tags["display-name"] != "" {
+		m.User.IRCDisplayName = m.Tags["display-name"]
 	}
 	delete(m.Tags, "display-name")
 	m.User.Type = m.Tags["user-type"]
@@ -259,6 +257,6 @@ func getAction(m *common.Msg) {
 
 func parseNewSub(m *common.Msg) {
 	m.Type = common.MsgSub
-	m.User.DisplayName = strings.Split(m.Text, " ")[0]
-	m.User.Name = strings.ToLower(m.User.DisplayName)
+	m.User.IRCDisplayName = strings.Split(m.Text, " ")[0]
+	m.User.Name = strings.ToLower(m.User.IRCDisplayName)
 }

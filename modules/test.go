@@ -85,7 +85,7 @@ func (module *Test) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error
 			Payload: &web.Payload{
 				Event: "emotes",
 				Data: map[string]interface{}{
-					"user":   msg.User.DisplayName,
+					"user":   msg.User.DisplayName(),
 					"emotes": msg.Emotes,
 				},
 			},
@@ -108,7 +108,7 @@ func (module *Test) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) error
 				Event: "chat",
 				Data: map[string]interface{}{
 					"text": msg.Text,
-					"user": msg.User.DisplayName,
+					"user": msg.User.DisplayName(),
 				},
 			},
 		}

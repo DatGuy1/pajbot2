@@ -21,13 +21,11 @@ func Init(config *config.Config) *RedisManager {
 	pool := redis.NewPool(func() (redis.Conn, error) {
 		c, err := redis.Dial("tcp", config.RedisHost)
 		if err != nil {
-			log.Fatal("An error occured while connecting to redis: ", err)
 			return nil, err
 		}
 		if config.RedisDatabase >= 0 {
 			_, err = c.Do("SELECT", config.RedisDatabase)
 			if err != nil {
-				log.Fatal("Error while selecting redis db:", err)
 				return nil, err
 			}
 		}
@@ -35,50 +33,53 @@ func Init(config *config.Config) *RedisManager {
 	}, 69)
 	// forsenGASM
 	r.Pool = pool
-	log.Debug("connected to redis")
 	return r
 }
 
 // UpdateGlobalUser sets global values for a user (in other words, values that transcend channels)
 // Only globally banned users and admins have a level in global redis
 func (r *RedisManager) UpdateGlobalUser(channel string, user *common.User, u *common.GlobalUser) {
-	conn := r.Pool.Get()
-	conn.Send("HSET", "global:last_active", user.Name, time.Now().Unix())
+	/*
+		conn := r.Pool.Get()
+		conn.Send("HSET", "global:last_active", user.Name, time.Now().Unix())
 
-	// Don't update the channel if the channel is empty (i.e. a whisper)
-	if channel != "" {
-		conn.Send("HSET", "global:channel", user.Name, channel)
-	}
-	conn.Flush()
-	conn.Close()
+		// Don't update the channel if the channel is empty (i.e. a whisper)
+		if channel != "" {
+			conn.Send("HSET", "global:channel", user.Name, channel)
+		}
+		conn.Flush()
+		conn.Close()
+	*/
 }
 
 // GetGlobalUser fills in the user and u objects with values from the users global values
 func (r *RedisManager) GetGlobalUser(channel string, user *common.User, u *common.GlobalUser) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	exist, err := conn.Do("HEXISTS", "global:last_active", user.Name)
-	e, _ := redis.Bool(exist, err)
-	if e {
-		conn.Send("HGET", "global:level", user.Name)
-		conn.Send("HGET", "global:channel", user.Name)
-		conn.Flush()
-		// can this be done in a loop somehow?
-		// Level
-		res, err := conn.Receive()
-		level, _ := redis.Int(res, err) // will be 0 unless user is admin or globally banned
-		if level > user.Level {
-			// XXX: Should this set u.Level instead? not sure!
-			user.Level = level
+	/*
+		conn := r.Pool.Get()
+		defer conn.Close()
+		exist, err := conn.Do("HEXISTS", "global:last_active", user.Name)
+		e, _ := redis.Bool(exist, err)
+		if e {
+			conn.Send("HGET", "global:level", user.Name)
+			conn.Send("HGET", "global:channel", user.Name)
+			conn.Flush()
+			// can this be done in a loop somehow?
+			// Level
+			res, err := conn.Receive()
+			level, _ := redis.Int(res, err) // will be 0 unless user is admin or globally banned
+			if level > user.Level {
+				// XXX: Should this set u.Level instead? not sure!
+				user.Level = level
+			}
+			// Channel
+			res, err = conn.Receive()
+			u.Channel, _ = redis.String(res, err)
+		} else {
+			r.UpdateGlobalUser(u.Channel, user, u)
+			// r.GetGlobalUser(channel, user, u)
 		}
-		// Channel
-		res, err = conn.Receive()
-		u.Channel, _ = redis.String(res, err)
-	} else {
-		r.UpdateGlobalUser(u.Channel, user, u)
-		r.GetGlobalUser(channel, user, u)
-	}
-	r.UpdateGlobalUser(channel, user, u)
+		r.UpdateGlobalUser(channel, user, u)
+	*/
 }
 
 // IsValidUser checks if the user is in the database
@@ -93,27 +94,10 @@ func (r *RedisManager) IsValidUser(channel string, _user string) bool {
 	return res
 }
 
-// SetPoints sets the amount of points a user has in the given channel
-func (r *RedisManager) SetPoints(channel string, user *common.User) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	conn.Send("ZADD", channel+":users:points", user.Points, user.Name)
-	conn.Flush()
-}
-
-// IncrPoints increases the points of a user in the given channel
-func (r *RedisManager) IncrPoints(channel string, user string, incrby int) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	conn.Send("ZINCRBY", channel+":users:points", incrby, user)
-	conn.Flush()
-}
-
 func (r *RedisManager) newUser(channel string, user *common.User) {
 	conn := r.Pool.Get()
 	defer conn.Close()
 	conn.Send("HSET", channel+":users:last_seen", user.Name, time.Now().Unix())
-	conn.Send("ZADD", channel+":users:points", user.Points, user.Name)
 
 	// Why is this called?
 	conn.Send("HSET", channel+":users:level", user.Name, r.getLevel(createLevel(0, 1), user))
@@ -135,88 +119,6 @@ func (r *RedisManager) ResetLevel(channel string, user *common.User) {
 	defer conn.Close()
 	conn.Send("HSET", channel+":users:level", user.Name, r.getLevel(createLevel(0, 1), user))
 	conn.Flush()
-}
-
-// UpdateUser saves data about a user in redis
-func (r *RedisManager) UpdateUser(channel string, user *common.User, oldUser *common.User) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	if user.Name == channel {
-		r.SetLevel(channel, user, 1500)
-	}
-	conn.Send("HSET", channel+":users:last_seen", user.Name, time.Now().Unix())
-	conn.Send("HSET", channel+":users:last_active", user.Name, time.Now().Unix())
-
-	// Update total message count if needed
-	if user.TotalMessageCount != oldUser.TotalMessageCount {
-		conn.Send("ZADD", channel+":users:total_message_count", user.TotalMessageCount, user.Name)
-	}
-
-	// Update online message count if needed
-	if user.OnlineMessageCount != oldUser.OnlineMessageCount {
-		conn.Send("ZADD", channel+":users:online_message_count", user.OnlineMessageCount, user.Name)
-	}
-
-	// Update offline message count if needed
-	if user.OfflineMessageCount != oldUser.OfflineMessageCount {
-		conn.Send("ZADD", channel+":users:offline_message_count", user.OfflineMessageCount, user.Name)
-	}
-
-	if user.Points != oldUser.Points {
-		r.IncrPoints(channel, user.Name, user.Points-oldUser.Points)
-	}
-
-	conn.Flush()
-}
-
-// LoadUser returns the user object, all default values if user doesnt exist
-func (r *RedisManager) LoadUser(channel string, user string) common.User {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	u := common.User{}
-	if r.IsValidUser(channel, user) {
-		u.Name = strings.ToLower(user)
-		u.DisplayName = user
-		r.GetUser(channel, &u)
-	}
-	return u
-}
-
-// GetUser fills out missing fields of the given User object
-// and creates new user in redis if the user doesnt exist
-func (r *RedisManager) GetUser(channel string, user *common.User) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	exist, err := conn.Do("HEXISTS", channel+":users:last_seen", user.Name)
-	e, _ := redis.Bool(exist, err)
-	if e {
-		conn.Send("HGET", channel+":users:level", user.Name)
-		conn.Send("ZSCORE", channel+":users:points", user.Name)
-		conn.Send("ZSCORE", channel+":users:total_message_count", user.Name)
-		conn.Send("ZSCORE", channel+":users:online_message_count", user.Name)
-		conn.Send("ZSCORE", channel+":users:offline_message_count", user.Name)
-		conn.Flush()
-		// can this be done in a loop somehow?
-		// Level
-		res, err := conn.Receive()
-		level, _ := redis.Uint64(res, err)
-		user.Level = r.getLevel(level, user)
-		// Points
-		res, err = conn.Receive()
-		user.Points, _ = redis.Int(res, err)
-		// TotalMessageCount
-		res, err = conn.Receive()
-		user.TotalMessageCount, _ = redis.Int(res, err)
-		// OnlineMessageCount
-		res, err = conn.Receive()
-		user.OnlineMessageCount, _ = redis.Int(res, err)
-		// OfflineMessageCount
-		res, err = conn.Receive()
-		user.OfflineMessageCount, _ = redis.Int(res, err)
-	} else {
-		r.newUser(channel, user)
-		r.GetUser(channel, user)
-	}
 }
 
 // Flags for user level values

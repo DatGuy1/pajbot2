@@ -9,6 +9,7 @@ import (
 
 // Top returns a list of the top users for the given category
 func (r *RedisManager) Top(channel string, category string, limit int) []common.User {
+	userList := []common.User{}
 	const keyF = "%s:users:%s"
 
 	conn := r.Pool.Get()
@@ -24,10 +25,13 @@ func (r *RedisManager) Top(channel string, category string, limit int) []common.
 	conn.Flush()
 	res, err := conn.Receive()
 	usernames, err := redis.Strings(res, err)
-	userList := []common.User{}
 	// this is poorly optimized
 	for _, username := range usernames {
-		userList = append(userList, r.LoadUser(channel, username))
+		u := common.User{
+			Name: username,
+		}
+		u.LoadDataConn(conn, channel)
+		userList = append(userList, u)
 	}
 
 	return userList

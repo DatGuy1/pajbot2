@@ -209,8 +209,10 @@ func (module *Bingo) bingoNumber(b *bot.Bot, msg *common.Msg, action *bot.Action
 						// The user guessed right.
 						// WHAT DO WE DO?
 						b.Sayf("%s just won the number bingo with the guess %d! He wins %d points",
-							newMessage.User.DisplayName, winningNumber, pointReward)
-						b.Redis.IncrPoints(b.Channel.Name, newMessage.User.Name, pointReward)
+							newMessage.User.DisplayName(), winningNumber, pointReward)
+
+						// TODO(pajlada): Load user, then save
+						// b.Redis.IncrPoints(b.Channel.Name, newMessage.User.Name, pointReward)
 						bingoRunning = false
 						return
 					}

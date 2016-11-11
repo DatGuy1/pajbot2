@@ -137,11 +137,11 @@ func (irc *Irc) readConnection(conn net.Conn) {
 					if b := irc.getBot(m.Channel); b != nil {
 						b.Read <- m
 					} else {
-						log.Debugf("No channel for message (chan: %s)", m.Channel)
+						log.Debugf("No channel for message (chan: %s) - %#v", m.Channel, m)
 					}
 				case common.MsgSub:
 					// Post sub to sub channel
-					log.Debugf("%s just subbed!", m.User.DisplayName)
+					log.Debugf("%s just subbed!", m.User.DisplayName())
 					if b := irc.getBot(m.Channel); b != nil {
 						b.Read <- m
 					} else {
@@ -154,7 +154,7 @@ func (irc *Irc) readConnection(conn net.Conn) {
 						break
 					}
 					// TODO: check room-id
-					log.Debugf("%s just resubbed for %d months", m.User.DisplayName, months)
+					log.Debugf("%s just resubbed for %d months", m.User.DisplayName(), months)
 
 					if b := irc.getBot(m.Channel); b != nil {
 						b.Read <- m

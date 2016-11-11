@@ -26,11 +26,17 @@ ExecCommand xD
 func (bot *Bot) ExecCommand(cmd *format.Command, msg *common.Msg) {
 	switch cmd.C {
 	case "source", "sender":
+		log.Debugf("Parsing for %s", msg.User.Name)
 		cmd.Outcome = format.ParseUser(&msg.User, cmd.SubC)
 	case "user":
 		if msg.Args != nil {
+			user := common.User{
+				Name: msg.Args[0],
+			}
 			if bot.Redis.IsValidUser(msg.Channel, msg.Args[0]) {
-				user := bot.Redis.LoadUser(msg.Channel, msg.Args[0])
+				log.Debugf("xD: %s", user.Name)
+				user.LoadData(bot.Redis.Pool, bot.Channel.Name)
+				defer user.RedisData.CloseWithoutSaving()
 				cmd.Outcome = format.ParseUser(&user, cmd.SubC)
 				return
 			}

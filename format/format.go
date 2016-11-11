@@ -58,19 +58,19 @@ ParseUser xD
 */
 func ParseUser(user *common.User, cmds []string) string {
 	if cmds == nil {
-		return user.DisplayName
+		return user.DisplayName()
 	}
 	switch cmds[0] {
 	case "name":
 		return user.Name
 	case "points":
-		return fmt.Sprintf("%d", user.Points)
+		return fmt.Sprintf("%d", user.RedisData.Points)
 	case "level":
 		return fmt.Sprintf("%d", user.Level)
 	case "lines":
 		return ParseLines(user, cmds[1])
 	default:
-		return user.DisplayName
+		return user.DisplayName()
 	}
 }
 
@@ -80,10 +80,10 @@ ParseLines xD
 func ParseLines(user *common.User, arg string) string {
 	switch arg {
 	case "online":
-		return fmt.Sprintf("%d", user.OnlineMessageCount)
+		return fmt.Sprintf("%d", user.RedisData.OnlineMessageCount)
 	case "offline":
-		return fmt.Sprintf("%d", user.OfflineMessageCount)
+		return fmt.Sprintf("%d", user.RedisData.OfflineMessageCount)
 	default:
-		return fmt.Sprintf("%d", user.TotalMessageCount)
+		return fmt.Sprintf("%d", user.RedisData.TotalMessageCount)
 	}
 }

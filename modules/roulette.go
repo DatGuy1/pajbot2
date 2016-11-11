@@ -153,7 +153,7 @@ func (module *Roulette) cmdRoulette(b *bot.Bot, msg *common.Msg, action *bot.Act
 
 	args := helper.GetTriggersN(msg.Text, 1)
 	user := &msg.User
-	if user.Points == 0 {
+	if user.RedisData.Points == 0 {
 		b.Mention(msg.User, "You don't have enough points to roulette")
 		return
 	}
@@ -184,8 +184,8 @@ func (module *Roulette) cmdRoulette(b *bot.Bot, msg *common.Msg, action *bot.Act
 		return
 	}
 
-	if bet > user.Points {
-		b.Mentionf(msg.User, betTooSmallMessage, user.Points)
+	if bet > user.RedisData.Points {
+		b.Mentionf(msg.User, betTooSmallMessage, user.RedisData.Points)
 		return
 	}
 
@@ -196,10 +196,10 @@ func (module *Roulette) runRoulette(b *bot.Bot, msg *common.Msg, points int) {
 	user := &msg.User
 	won := module.WinPercentage.Int() >= rand.Intn(101)
 	if won {
-		user.Points += points
+		user.RedisData.Points += points
 		b.SayFormat(module.WinMessage.String(), msg, points)
 	} else {
-		user.Points -= points
+		user.RedisData.Points -= points
 		b.SayFormat(module.LoseMessage.String(), msg, points)
 	}
 }

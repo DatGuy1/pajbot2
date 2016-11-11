@@ -40,7 +40,7 @@ func (module *BroadcastEmotes) Check(b *bot.Bot, msg *common.Msg, action *bot.Ac
 			Payload: &web.Payload{
 				Event: "emotes",
 				Data: map[string]interface{}{
-					"user":   msg.User.DisplayName,
+					"user":   msg.User.DisplayName(),
 					"emotes": msg.Emotes,
 				},
 			},

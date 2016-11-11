@@ -64,7 +64,7 @@ func (module *Raffle) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) err
 			return nil
 		}
 		if module.points != 0 {
-			b.Sayf("%s there is already a raffle running OMGScoots", msg.User.DisplayName)
+			b.Sayf("%s there is already a raffle running OMGScoots", msg.User.DisplayName())
 			return nil
 		}
 		if len(spl) < 2 {
@@ -134,7 +134,8 @@ func (module *Raffle) startRaffle(length time.Duration, points int) {
 	var winnersString string
 	for _, w := range winners {
 		winnersString += w + ","
-		module.bot.Redis.IncrPoints(module.bot.Channel.Name, w, pts)
+		// TODO(pajlada): Load user then save
+		// module.bot.Redis.IncrPoints(module.bot.Channel.Name, w, pts)
 	}
 	module.bot.Sayf("%s won %d each PogChamp", winnersString, pts)
 	module.reset()
