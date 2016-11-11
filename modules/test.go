@@ -204,6 +204,23 @@ func cmdTest(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 		log.Debugf("WHISPER %s", msg.User.Name)
 		b.Whisper(msg.User.Name, "TEST WHISPER")
 
+	case "streams":
+		if len(m) > 1 {
+			apirequest.Twitch.GetStreams(m[1],
+				func(streams []gotwitch.Stream) {
+					b.Sayf("Num streams: %d", len(streams))
+				},
+				func(statusCode int, statusMessage, errorMessage string) {
+					b.Sayf("ERROR: %d", statusCode)
+					b.Say(statusMessage)
+					b.Say(errorMessage)
+				}, func(err error) {
+					b.Say("Internal error")
+				})
+		} else {
+			b.Say("Usage: !test streams pajlada,forsenlol")
+		}
+
 	default:
 		b.Sayf("Unhandled action %s", m[0])
 		return
