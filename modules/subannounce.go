@@ -96,6 +96,10 @@ func (module *SubAnnounce) parseSettings(jsonData []byte) {
 			Alias: (*Alias)(module),
 		}
 	*/
+	if len(jsonData) == 0 {
+		return
+	}
+
 	if err := json.Unmarshal(jsonData, module); err != nil {
 		log.Error(err)
 	}
