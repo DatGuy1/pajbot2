@@ -2,9 +2,11 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/pajlada/pajbot2/common"
+	"github.com/pajlada/pajbot2/helper"
 	"github.com/pajlada/pajbot2/sqlmanager"
 )
 
@@ -80,16 +82,32 @@ func (c *Channel) End() *time.Time {
 
 // Uptime returns a time.Time object for how long the stream has been online/offline
 func (c *Channel) Uptime() time.Duration {
-	if c.Online() {
-		return time.Since(c.Start())
-	}
+	return time.Since(c.Start())
+}
 
+// Downtime returns a time.Time object for how long the stream has been online/offline
+func (c *Channel) Downtime() (time.Duration, error) {
 	end := c.End()
 	if end != nil {
-		return time.Since(*end)
+		return time.Since(*end), nil
 	}
 
-	return 5 * time.Second
+	return time.Second, errors.New("No stream end registered")
+}
+
+// UptimeString returns uptime or downtime
+func (c *Channel) UptimeString() string {
+	return helper.FormatDuration(c.Uptime())
+}
+
+// DowntimeString returns uptime or downtime
+func (c *Channel) DowntimeString() string {
+	dur, err := c.Downtime()
+	if err != nil {
+		return helper.FormatDuration(dur)
+	}
+
+	return err.Error()
 }
 
 // ChannelSQLWrapper contains data about the channel that's stored in MySQL

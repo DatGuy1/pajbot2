@@ -163,7 +163,11 @@ func cmdTest(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 
 	switch m[0] {
 	case "test":
-		b.Sayf("XD %s", b.Channel.Uptime())
+		if b.Channel.Online() {
+			b.Sayf("%s has been online for %s", b.Channel.Name, b.Channel.UptimeString())
+		} else {
+			b.Sayf("%s has been offline for %s", b.Channel.Name, b.Channel.DowntimeString())
+		}
 	case "say":
 		b.Say(strings.Join(m[1:], " "))
 	case "lasttweet":

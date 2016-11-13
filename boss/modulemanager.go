@@ -22,6 +22,7 @@ func modulesInit(b *bot.Bot) {
 			modules.NewAdmin(),
 			modules.NewDebug(),
 			modules.NewEmotes(),
+			modules.NewTest(),
 		}
 	} else {
 		b.AllModules = []bot.Module{
