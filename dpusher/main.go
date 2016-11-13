@@ -11,6 +11,7 @@ import (
 	"github.com/dankeroni/gotwitch"
 	"github.com/pajlada/pajbot2/apirequest"
 	"github.com/pajlada/pajbot2/common/config"
+	"github.com/pajlada/pajbot2/models"
 	"github.com/pajlada/pajbot2/plog"
 	"github.com/pajlada/pajbot2/redismanager"
 	"github.com/shogo82148/go-shuffle"
@@ -45,7 +46,7 @@ func runCmd() {
 		log.Fatal("An error occured while loading the config file:", err)
 	}
 
-	Redis = redismanager.Init(config)
+	models.InitRedis(config)
 
 	// Initialize twitch API
 	apirequest.Twitch = gotwitch.New(config.Auth.Twitch.User.ClientID)

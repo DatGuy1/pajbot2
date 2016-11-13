@@ -44,7 +44,7 @@ func (c *Channel) updateStatus() {
 		conn := db.Pool.Get()
 		defer conn.Close()
 
-		stream, err := common.GetLastStream(db.Pool, c.Name)
+		stream, err := GetLastStream(c.Name)
 		if err != nil {
 			return
 		}

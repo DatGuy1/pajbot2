@@ -31,5 +31,11 @@ func InitRedis(config *config.Config) {
 	db = r
 }
 
+// GetRedisConn XD
+// WARNING: You're responsible for closing the connection
+func GetRedisConn() redis.Conn {
+	return db.Pool.Get()
+}
+
 // DB xD
 var db *RedisManager

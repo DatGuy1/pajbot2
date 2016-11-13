@@ -1,4 +1,4 @@
-package common
+package models
 
 import (
 	"encoding/json"
@@ -26,8 +26,8 @@ type Stream struct {
 }
 
 // GetLastStream xD
-func GetLastStream(pool *redis.Pool, channel string) (*Stream, error) {
-	conn := pool.Get()
+func GetLastStream(channel string) (*Stream, error) {
+	conn := db.Pool.Get()
 	defer conn.Close()
 
 	bytes, err := redis.ByteSlices(conn.Do("LRANGE", channel+":streams", 0, 0))
@@ -46,8 +46,8 @@ func GetLastStream(pool *redis.Pool, channel string) (*Stream, error) {
 }
 
 // GetLastTwoStreams xD
-func GetLastTwoStreams(pool *redis.Pool, channel string) ([]Stream, error) {
-	conn := pool.Get()
+func GetLastTwoStreams(channel string) ([]Stream, error) {
+	conn := db.Pool.Get()
 	defer conn.Close()
 
 	bytes, err := redis.ByteSlices(conn.Do("LRANGE", channel+":streams", 0, 1))
@@ -79,11 +79,11 @@ func ChunkFromTwitchStream(in gotwitch.Stream) StreamChunk {
 }
 
 // IsNewStreamChunk xD
-func IsNewStreamChunk(pool *redis.Pool, channel string, streamChunk StreamChunk) (bool, *Stream, error) {
-	conn := pool.Get()
+func IsNewStreamChunk(channel string, streamChunk StreamChunk) (bool, *Stream, error) {
+	conn := db.Pool.Get()
 	defer conn.Close()
 
-	streams, err := GetLastTwoStreams(pool, channel)
+	streams, err := GetLastTwoStreams(channel)
 	if err != nil {
 		return false, nil, err
 	}
@@ -123,8 +123,8 @@ func addNewStream(conn redis.Conn, channel string, streamChunk StreamChunk) erro
 }
 
 // AddNewStream xD
-func AddNewStream(pool *redis.Pool, channel string, streamChunk StreamChunk) error {
-	conn := pool.Get()
+func AddNewStream(channel string, streamChunk StreamChunk) error {
+	conn := db.Pool.Get()
 	defer conn.Close()
 
 	err := addNewStream(conn, channel, streamChunk)
@@ -171,8 +171,8 @@ func updateLastStream(conn redis.Conn, channel string, stream *Stream) error {
 }
 
 // UpdateLastStream xD
-func UpdateLastStream(pool *redis.Pool, channel string, stream *Stream) error {
-	conn := pool.Get()
+func UpdateLastStream(channel string, stream *Stream) error {
+	conn := db.Pool.Get()
 	defer conn.Close()
 
 	err := updateLastStream(conn, channel, stream)

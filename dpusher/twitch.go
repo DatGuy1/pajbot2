@@ -7,7 +7,7 @@ import (
 	"github.com/dankeroni/gotwitch"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pajlada/pajbot2/apirequest"
-	"github.com/pajlada/pajbot2/common"
+	"github.com/pajlada/pajbot2/models"
 )
 
 func runTwitch() {
@@ -29,7 +29,7 @@ func twitchRunStreamStatusUpdate() {
 		"pajbot",
 	}
 	now := time.Now()
-	conn := Redis.Pool.Get()
+	conn := models.GetRedisConn()
 	var wg sync.WaitGroup
 	defer func(conn redis.Conn) {
 		conn.Flush()
@@ -42,7 +42,7 @@ func twitchRunStreamStatusUpdate() {
 			apirequest.Twitch.GetStream(channel,
 				func(twitchStream gotwitch.Stream) {
 					if twitchStream.ID == 0 {
-						lastStream, err := common.GetLastStream(Redis.Pool, channel)
+						lastStream, err := models.GetLastStream(channel)
 						if err != nil {
 							// log.Errorf("Error getting last stream for %s: %s", channel, err)
 							return
@@ -56,12 +56,12 @@ func twitchRunStreamStatusUpdate() {
 						lastStream.End = &now
 						log.Debugf("%s is now marked as offline", channel)
 
-						common.UpdateLastStreamP(conn, channel, lastStream)
+						models.UpdateLastStreamP(conn, channel, lastStream)
 					} else {
-						pajbotStreamChunk := common.ChunkFromTwitchStream(twitchStream)
+						pajbotStreamChunk := models.ChunkFromTwitchStream(twitchStream)
 						channel := twitchStream.Channel.Name
 
-						isNew, prevStream, err := common.IsNewStreamChunk(Redis.Pool, channel, pajbotStreamChunk)
+						isNew, prevStream, err := models.IsNewStreamChunk(channel, pajbotStreamChunk)
 						if err != nil {
 							log.Error(err)
 							return
@@ -77,19 +77,19 @@ func twitchRunStreamStatusUpdate() {
 									prevStream.AddStreamChunk(pajbotStreamChunk)
 									// Previous stream ended within the last 5 minutes, just continue on that one instead
 									log.Debugf("[%s] Updating last stream with new chunk %d", channel, pajbotStreamChunk.ID)
-									common.UpdateLastStreamP(conn, channel, prevStream)
+									models.UpdateLastStreamP(conn, channel, prevStream)
 									return
 								}
 							}
 
 							// Add new stream with new chunk
 							log.Debugf("Adding new stream with new chunk %s - %d", channel, pajbotStreamChunk.ID)
-							common.AddNewStreamP(conn, channel, pajbotStreamChunk)
+							models.AddNewStreamP(conn, channel, pajbotStreamChunk)
 						} else {
 							// log.Debugf("[%s] Update last seen for chunk %d", channel, pajbotStreamChunk.ID)
 							prevStream.End = nil
 							prevStream.UpdateStreamChunk(pajbotStreamChunk)
-							common.UpdateLastStreamP(conn, channel, prevStream)
+							models.UpdateLastStreamP(conn, channel, prevStream)
 						}
 					}
 				},
