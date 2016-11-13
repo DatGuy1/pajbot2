@@ -21,6 +21,7 @@ import (
 	"github.com/pajlada/pajbot2/common"
 	"github.com/pajlada/pajbot2/common/config"
 	"github.com/pajlada/pajbot2/helper"
+	"github.com/pajlada/pajbot2/models"
 	"github.com/pajlada/pajbot2/plog"
 	"github.com/pajlada/pajbot2/sqlmanager"
 	"github.com/pajlada/pajbot2/web"
@@ -145,6 +146,9 @@ func runCmd() {
 	// Initialize twitch API
 	apirequest.Twitch = gotwitch.New(config.Auth.Twitch.User.ClientID)
 
+	// Initialize models for db access (Redis)
+	models.InitRedis(config)
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
@@ -240,7 +244,7 @@ func linkchannelCmd() {
 	channelName = helper.ReadArg(reader)
 
 	// See if the bot is active in the channel already
-	channels, err := common.GetChannelsByName(sql.Session, channelName)
+	channels, err := models.GetChannelsByName(sql.Session, channelName)
 	if err != nil {
 		fmt.Println("No channel with the name " + channelName)
 		fmt.Println(err)
@@ -257,7 +261,7 @@ func linkchannelCmd() {
 	}
 
 	// Create new channel object with this bot ID
-	c := &common.Channel{
+	c := &models.Channel{
 		Name:  channelName,
 		BotID: b.ID,
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/pajlada/pajbot2/common"
 	"github.com/pajlada/pajbot2/common/basemodule"
 	"github.com/pajlada/pajbot2/helper"
+	"github.com/pajlada/pajbot2/models"
 )
 
 /*
@@ -149,7 +150,7 @@ func cmdJoinChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	newChannel := strings.ToLower(strings.Replace(m[0], "#", "", -1))
 
 	// Fetch all existing channels and see if this channel is already there
-	channels, err := common.GetChannelsByBotID(b.SQL.Session, b.BotAccountID)
+	channels, err := models.GetChannelsByBotID(b.SQL.Session, b.BotAccountID)
 	if err != nil {
 		b.Say("Errors fetching existing channels")
 		return
@@ -179,7 +180,7 @@ func cmdJoinChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 
 	if isChannelNew {
 		// Insert new channel
-		c := &common.Channel{
+		c := &models.Channel{
 			Name: newChannel,
 		}
 		c.InsertNewToSQL(b.SQL)
@@ -200,7 +201,7 @@ func cmdLeaveChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	newChannelName := strings.ToLower(strings.Replace(m[0], "#", "", -1))
 
 	// Fetch all existing channels and see if this channel is already there
-	channels, err := common.GetChannelsByBotID(b.SQL.Session, b.BotAccountID)
+	channels, err := models.GetChannelsByBotID(b.SQL.Session, b.BotAccountID)
 	if err != nil {
 		b.Say("Errors fetching existing channels")
 		return
@@ -227,7 +228,7 @@ func cmdLeaveChannel(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 }
 
 func cmdQuit(b *bot.Bot, msg *common.Msg, action *bot.Action) {
-	b.Sayf("Shutting down, build time: %s", common.BuildTime)
+	// b.Sayf("Shutting down, build time: %s", common.BuildTime)
 	b.Quit <- "Quit from command by " + msg.User.Name
 }
 

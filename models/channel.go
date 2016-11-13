@@ -1,9 +1,10 @@
-package common
+package models
 
 import (
 	"database/sql"
 	"time"
 
+	"github.com/pajlada/pajbot2/common"
 	"github.com/pajlada/pajbot2/sqlmanager"
 )
 
@@ -29,10 +30,66 @@ type Channel struct {
 	// XXX: this should probably we renamed to BotAcountID instead of naming it BotID or bot_id everywhere
 	BotID int
 
-	Emotes ExtensionEmotes
+	Emotes common.ExtensionEmotes
 
-	Online bool
-	Uptime time.Time // time when stream went live, time when last stream ended if not online
+	online     bool
+	start      time.Time
+	end        *time.Time
+	updateTime time.Time
+}
+
+func (c *Channel) updateStatus() {
+	const statusCacheTime = -20 * time.Second
+	if time.Now().Add(statusCacheTime).After(c.updateTime) {
+		conn := db.Pool.Get()
+		defer conn.Close()
+
+		stream, err := common.GetLastStream(db.Pool, c.Name)
+		if err != nil {
+			return
+		}
+
+		c.updateTime = time.Now()
+
+		c.online = stream.End == nil
+		c.start = stream.Start
+		c.end = stream.End
+	}
+}
+
+// Online return online status of channel
+func (c *Channel) Online() bool {
+	c.updateStatus()
+
+	return c.online
+}
+
+// Start return time when the stream started
+func (c *Channel) Start() time.Time {
+	c.updateStatus()
+
+	return c.start
+}
+
+// End return time when the stream started
+func (c *Channel) End() *time.Time {
+	c.updateStatus()
+
+	return c.end
+}
+
+// Uptime returns a time.Time object for how long the stream has been online/offline
+func (c *Channel) Uptime() time.Duration {
+	if c.Online() {
+		return time.Since(c.Start())
+	}
+
+	end := c.End()
+	if end != nil {
+		return time.Since(*end)
+	}
+
+	return 5 * time.Second
 }
 
 // ChannelSQLWrapper contains data about the channel that's stored in MySQL

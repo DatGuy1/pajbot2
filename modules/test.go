@@ -162,6 +162,8 @@ func cmdTest(b *bot.Bot, msg *common.Msg, action *bot.Action) {
 	}
 
 	switch m[0] {
+	case "test":
+		b.Sayf("XD %s", b.Channel.Uptime())
 	case "say":
 		b.Say(strings.Join(m[1:], " "))
 	case "lasttweet":

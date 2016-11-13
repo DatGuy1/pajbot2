@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/pajlada/pajbot2/common"
+	"github.com/pajlada/pajbot2/models"
 	"github.com/pajlada/pajbot2/pbtwitter"
 	"github.com/pajlada/pajbot2/redismanager"
 	"github.com/pajlada/pajbot2/sqlmanager"
@@ -40,7 +41,7 @@ type Bot struct {
 	RawRead chan string
 
 	Join    chan string
-	Channel common.Channel
+	Channel models.Channel
 	Redis   *redismanager.RedisManager
 	SQL     *sqlmanager.SQLManager
 	Twitter *pbtwitter.Bot
@@ -59,7 +60,7 @@ var Bots = make(map[string]*Bot)
 NewBot instansiates a new Bot object with the given Config object
 */
 func NewBot(cfg Config) *Bot {
-	channel := common.Channel{
+	channel := models.Channel{
 		Name: cfg.Channel,
 	}
 	b := &Bot{
@@ -94,7 +95,7 @@ func (bot *Bot) Init() {
 	go bot.readChat()
 	go bot.readTweets()
 
-	bot.Sayf("Joined channel %s, build time: %s", bot.Channel.Name, common.BuildTime)
+	// bot.Sayf("Joined channel %s, build time: %s", bot.Channel.Name, common.BuildTime)
 }
 
 func (bot *Bot) readChat() {

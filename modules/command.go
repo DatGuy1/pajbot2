@@ -9,6 +9,7 @@ import (
 	"github.com/pajlada/pajbot2/common"
 	"github.com/pajlada/pajbot2/common/basemodule"
 	"github.com/pajlada/pajbot2/helper"
+	"github.com/pajlada/pajbot2/models"
 	"github.com/pajlada/pajbot2/sqlmanager"
 )
 
@@ -265,7 +266,7 @@ func (module *Command) Check(b *bot.Bot, msg *common.Msg, action *bot.Action) er
 	return module.commandHandler.Check(b, msg, action)
 }
 
-func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel common.Channel) int {
+func (module *Command) loadCommands(sql *sqlmanager.SQLManager, channel models.Channel) int {
 	// Fetch rows from pb_command
 	rows, err := sql.Session.Query("SELECT id, channel_id, triggers, response, response_type FROM pb_command")
 

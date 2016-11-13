@@ -34,5 +34,5 @@ func (b *Bot) Handle(msg common.Msg) {
 		}
 	}
 
-	msg.User.IncrLines(b.Channel.Online)
+	msg.User.IncrLines(b.Channel.Online())
 }

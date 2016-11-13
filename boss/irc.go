@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/dghubble/go-twitter/twitter"
+	"github.com/pajlada/pajbot2/models"
 	"github.com/pajlada/pajbot2/parser"
 	"github.com/pajlada/pajbot2/pbtwitter"
 	"github.com/pajlada/pajbot2/plog"
@@ -310,7 +311,7 @@ func InitIRCConnection(config IRCConfig, botAccount common.DBUser) *Irc {
 	// Start a goroutine which handles joining and parting from channels
 	go irc.JoinChannels()
 
-	channels, err := common.GetChannelsByBotID(irc.SQL.Session, botAccount.ID)
+	channels, err := models.GetChannelsByBotID(irc.SQL.Session, botAccount.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -334,7 +335,7 @@ func InitIRCConnection(config IRCConfig, botAccount common.DBUser) *Irc {
 	if !hasOwnChannel {
 		log.Debugf("Creating own channel for %s", botAccount.Name)
 		// Create our own channel, then use InsertNewToSQL
-		ownChannel := &common.Channel{
+		ownChannel := &models.Channel{
 			Name:  botAccount.Name,
 			BotID: botAccount.ID,
 		}
