@@ -39,6 +39,7 @@ func modulesInit(b *bot.Bot) {
 			modules.NewSubAnnounce(),
 			modules.NewTest(),
 			modules.NewTop(),
+			modules.NewUptime(),
 		}
 	}
 }
