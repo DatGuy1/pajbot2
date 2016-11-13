@@ -86,7 +86,7 @@ func twitchRunStreamStatusUpdate() {
 							log.Debugf("Adding new stream with new chunk %s - %d", channel, pajbotStreamChunk.ID)
 							common.AddNewStreamP(conn, channel, pajbotStreamChunk)
 						} else {
-							log.Debugf("[%s] Update last seen for chunk %d", channel, pajbotStreamChunk.ID)
+							// log.Debugf("[%s] Update last seen for chunk %d", channel, pajbotStreamChunk.ID)
 							prevStream.End = nil
 							prevStream.UpdateStreamChunk(pajbotStreamChunk)
 							common.UpdateLastStreamP(conn, channel, prevStream)
@@ -103,9 +103,7 @@ func twitchRunStreamStatusUpdate() {
 		}(conn, channel)
 	}
 
-	log.Debug("Waiting for api requests...")
 	wg.Wait()
-	log.Debug("done")
 }
 
 func twitchUpdateStreamStatus() {
