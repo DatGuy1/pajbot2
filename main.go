@@ -28,10 +28,6 @@ import (
 
 var log = plog.GetLogger()
 
-func cleanup() {
-	// TODO: Perform cleanups
-}
-
 var buildTime string
 
 var version = flag.Bool("version", false, "Show pajbot2 version")
@@ -121,7 +117,6 @@ func wsHandler(conn *websocket.Conn) {
 }
 
 func runCmd() {
-	// TODO: Use config path from system arguments
 	config, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatal("An error occured while loading the config file:", err)
@@ -167,7 +162,6 @@ func runCmd() {
 	webBoss := web.Init(config, webCfg)
 	go webBoss.Run()
 	q := <-config.Quit
-	cleanup()
 	log.Fatal(q)
 }
 
