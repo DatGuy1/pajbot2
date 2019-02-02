@@ -259,21 +259,8 @@ func (m *pajbot1BanphraseFilter) Initialize(botChannel pkg.BotChannel, settings 
 	m.addCustomBanphrase("n3gg3r")
 
 	m.addCustomBanphrase("g63r")
+    */
 
-	m.banphrases = append(m.banphrases, &filters.Pajbot1Banphrase{
-		ID:            -1,
-		Name:          "Custom",
-		Phrase:        "b00ger",
-		Length:        1,
-		Operator:      filters.OperatorContains,
-		Permanent:     false,
-		Warning:       false,
-		Notify:        false,
-		CaseSensitive: false,
-		Enabled:       true,
-		SubImmunity:   false,
-		RemoveAccents: true,
-	})*/
 	err := m.loadPajbot1Banphrases()
 	if err != nil {
 		return err
