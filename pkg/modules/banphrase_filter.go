@@ -49,7 +49,7 @@ func (m *pajbot1BanphraseFilter) addCustomBanphrase(phrase string) {
 }
 
 func (m *pajbot1BanphraseFilter) loadPajbot1Banphrases() error {
-	const queryF = `SELECT * FROM tb_banphrase`
+	const queryF = `SELECT * FROM tb_banphrase2`
 
 	session := m.server.oldSession
 
@@ -76,7 +76,7 @@ func (m *pajbot1BanphraseFilter) loadPajbot1Banphrases() error {
 func (m *pajbot1BanphraseFilter) Initialize(botChannel pkg.BotChannel, settings []byte) error {
 	m.botChannel = botChannel
 
-	// hard-coded banphrases
+	/* hard-coded banphrases
 	m.addCustomBanphrase("n!66ger")
 
 	m.addCustomBanphrase("negro")
@@ -273,7 +273,7 @@ func (m *pajbot1BanphraseFilter) Initialize(botChannel pkg.BotChannel, settings 
 		Enabled:       true,
 		SubImmunity:   false,
 		RemoveAccents: true,
-	})
+	})*/
 	err := m.loadPajbot1Banphrases()
 	if err != nil {
 		return err
@@ -340,13 +340,11 @@ func (m *pajbot1BanphraseFilter) check(bot pkg.Sender, source pkg.Channel, text 
 					}
 				*/
 
-				if source.GetChannel() == "krakenbul" || bp.GetID() == -1 {
-					reason := fmt.Sprintf("Matched banphrase with name '%s' and id '%d'", bp.GetName(), bp.GetID())
-					action.Set(pkg.Timeout{bp.GetLength(), reason})
-					action.SetNotifyModerator(bot.MakeUser("pajlada"))
-					// fmt.Printf("Banphrase triggered: %#v for user %s", bp, user.GetName())
-					return nil
-				}
+				reason := fmt.Sprintf("Matched banphrase with name '%s' and id '%d'", bp.GetName(), bp.GetID())
+				action.Set(pkg.Timeout{bp.GetLength(), reason})
+				action.SetNotifyModerator(bot.MakeUser("datguy1"))
+				// fmt.Printf("Banphrase triggered: %#v for user %s", bp, user.GetName())
+				return nil
 			}
 
 			if !bp.IsAdvanced() {
@@ -366,12 +364,8 @@ func (m *pajbot1BanphraseFilter) OnMessage(bot pkg.Sender, source pkg.Channel, u
 		return nil
 	}
 
-	if user.GetName() == "supibot" {
-		return nil
-	}
-
 	m.check(bot, source, message.GetText(), action)
-	m.check(bot, source, user.GetName(), action)
+	// m.check(bot, source, user.GetName(), action)
 
 	return nil
 }

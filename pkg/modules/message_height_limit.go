@@ -84,7 +84,7 @@ func initCLR() error {
 	fmt.Println("Executable dir", executableDir)
 	fmt.Println("os args 0:", os.Args[0])
 
-	clrPath := utils.GetEnv("LIBCOREFOLDER", "/usr/share/dotnet/shared/Microsoft.NETCore.App/2.1.5")
+	clrPath := utils.GetEnv("LIBCOREFOLDER", "/usr/share/dotnet/shared/Microsoft.NETCore.App/2.2.0")
 
 	// Path to our own executable
 	clr1 := C.CString(executableDir + "/bot")
