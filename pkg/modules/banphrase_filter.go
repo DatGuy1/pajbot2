@@ -289,11 +289,11 @@ type TimeoutData struct {
 	Timestamp   time.Time
 }
 
-func (m *pajbot1BanphraseFilter) OnWhisper(bot pkg.Sender, source pkg.User, message pkg.Message) error {
+func (m *pajbot1BanphraseFilter) OnWhisper(bot pkg.BotChannel, source pkg.User, message pkg.Message) error {
 	return nil
 }
 
-func (m *pajbot1BanphraseFilter) check(bot pkg.Sender, source pkg.Channel, text string, action pkg.Action) error {
+func (m *pajbot1BanphraseFilter) check(bot pkg.BotChannel, text string, action pkg.Action) error {
 	originalVariations, lowercaseVariations, err := utils.MakeVariations(text, true)
 	if err != nil {
 		return err
@@ -312,12 +312,12 @@ func (m *pajbot1BanphraseFilter) check(bot pkg.Sender, source pkg.Channel, text 
 			if bp.Triggers(variation) {
 				// fmt.Printf("Banphrase triggered: %#v\n", bp)
 				/*
-					if bp.IsAdvanced() && source.GetChannel() == "forsen" {
+					if bp.IsAdvanced() && source.GetName() == "forsen" {
 						lol := TimeoutData{
 							FullMessage: message.GetText(),
 							Banphrase:   bp,
 							Username:    user.GetName(),
-							Channel:     source.GetChannel(),
+							Channel:     source.GetName(),
 							Timestamp:   time.Now().UTC(),
 						}
 						c := m.server.redis.Get()
@@ -346,13 +346,12 @@ func (m *pajbot1BanphraseFilter) check(bot pkg.Sender, source pkg.Channel, text 
 	return nil
 }
 
-func (m *pajbot1BanphraseFilter) OnMessage(bot pkg.Sender, source pkg.Channel, user pkg.User, message pkg.Message, action pkg.Action) error {
-	if user.IsModerator() || user.IsBroadcaster(source) {
+func (m *pajbot1BanphraseFilter) OnMessage(bot pkg.BotChannel, user pkg.User, message pkg.Message, action pkg.Action) error {
+	if user.IsModerator() || user.IsBroadcaster(bot.Channel()) {
 		return nil
 	}
 
-	m.check(bot, source, message.GetText(), action)
-	// m.check(bot, source, user.GetName(), action)
-
+	m.check(bot, message.GetText(), action)
+	// m.check(bot, user.GetName(), action)
 	return nil
 }
