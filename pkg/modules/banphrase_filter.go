@@ -329,7 +329,7 @@ func (m *pajbot1BanphraseFilter) check(bot pkg.BotChannel, text string, action p
 
 				reason := fmt.Sprintf("Matched banphrase with name '%s' and id '%d'", bp.GetName(), bp.GetID())
 				action.Set(pkg.Timeout{bp.GetLength(), reason})
-				action.SetNotifyModerator(bot.MakeUser("datguy1"))
+				action.SetNotifyModerator(bot.Bot().MakeUser("datguy1"))
 				// fmt.Printf("Banphrase triggered: %#v for user %s", bp, user.GetName())
 				return nil
 			}

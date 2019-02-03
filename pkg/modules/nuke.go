@@ -234,7 +234,7 @@ func (m *nukeModule) nuke(source pkg.User, bot pkg.BotChannel, phrase string, sc
 		bot.Timeout(user, timeoutDurationInSeconds, reason)
 	}
 
-	bot.Say(channel, fmt.Sprintf("%s nuked %d users for the phrase %s in the last %s for %s\n", source.GetName(), len(targets), phrase, scrollbackLength, timeoutDuration))
+	bot.Say(fmt.Sprintf("%s nuked %d users for the phrase %s in the last %s for %s\n", source.GetName(), len(targets), phrase, scrollbackLength, timeoutDuration))
 }
 
 func (m *nukeModule) addMessage(channel pkg.Channel, user pkg.User, message pkg.Message) {
