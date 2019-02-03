@@ -144,7 +144,7 @@ func NewUser() *User {
 }
 
 func (c *User) Trigger(bot pkg.Sender, botChannel pkg.BotChannel, parts []string, channel pkg.Channel, user pkg.User, message pkg.Message, action pkg.Action) {
-	if len(parts) < 2 {
+	if len(parts) < 2 || !user.HasPermission(channel, pkg.PermissionAdmin) {
 		return
 	}
 

@@ -209,7 +209,9 @@ type Ping struct {
 }
 
 func (c Ping) Trigger(bot pkg.Sender, botChannel pkg.BotChannel, parts []string, channel pkg.Channel, user pkg.User, message pkg.Message, action pkg.Action) {
-	bot.Mention(channel, user, fmt.Sprintf("pb2 has been running for %s", utils.TimeSince(startTime)))
+    if user.IsModerator() || user.IsBroadcaster(channel) {
+	    bot.Mention(channel, user, fmt.Sprintf("pb2 has been running for %s", utils.TimeSince(startTime)))
+    }
 }
 
 type Simplify struct {
